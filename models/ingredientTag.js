@@ -19,10 +19,12 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
     },
     name: DataTypes.STRING,
-    image: DataTypes.STRING,
-    seasonId: DataTypes.INTEGER,
+    image: {
+      type: DataTypes.STRING,
+    },
   }, {
     sequelize,
+    freezeTableName: true,
     modelName: 'IngredientTag',
   });
   return IngredientTag;

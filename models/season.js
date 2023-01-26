@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     nameOfSeason: DataTypes.STRING,
   }, {
     sequelize,
+    freezeTableName: true,
     modelName: 'Season',
   });
   return Season;

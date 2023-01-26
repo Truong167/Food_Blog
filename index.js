@@ -1,29 +1,23 @@
 const express = require('express')
-const { sequelize } = require('./models')
+const bodyParser = require('body-parser')
+const routes = require('./routes/index.routes')
+const connectDb = require('./config/connectDb')
+require('dotenv').config()
 
-const PORT = 4000
+
+const PORT = process.env.PORT || 7070
 const app = express()
 
-const connectDb = async () => {
-    console.log('Checking connection')
-    try {
-        await sequelize.authenticate()
-        console.log('Authenticating')
-    } catch (error) {
-        console.log(error)
-    }
-}
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
 
-(async () => {
-    await connectDb()
+routes(app)
 
-    console.log('Connected to database')
 
-    app.listen(PORT, () => console.log(`Serving on port ${PORT}`))
+connectDb()
 
-})()
 
-// app.get('/', (req, res) => {
-//     res.send("Hello, world!")
-// })
+app.listen(PORT, () => console.log(`Serving on port ${PORT}`))
+
+
 

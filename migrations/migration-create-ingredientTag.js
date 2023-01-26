@@ -6,16 +6,16 @@ module.exports = {
         tag: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING
+        type: Sequelize.STRING(128)
       },
       name: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(128),
+        allowNull: false
       },
       image: {
-        type: Sequelize.INTEGER
-      },
-      seasonId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING(128),
+        unique: true,
+        allowNull: false
       },
       createdAt: {
         allowNull: false,

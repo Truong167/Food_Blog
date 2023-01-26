@@ -11,6 +11,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      // Account.belongsTo(models.User, {
+      //   foreignKey: 'userId',
+      //   as: 'userData',
+      //   onDelete: 'CASCADE',
+      //   onUpdate: 'CASCADE'
+      // });
     }
   }
   Account.init({
@@ -20,9 +26,12 @@ module.exports = (sequelize, DataTypes) => {
     },
     password: DataTypes.STRING,
     userId: DataTypes.INTEGER,
+    
   }, {
     sequelize,
+    freezeTableName: true,
     modelName: 'Account',
   });
+  
   return Account;
 };

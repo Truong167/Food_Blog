@@ -6,7 +6,7 @@ module.exports = {
       tag: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(128),
         references: {
           model: 'IngredientTag',
           key: 'tag'

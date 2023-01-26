@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     tag: DataTypes.INTEGER,
   }, {
     sequelize,
+    freezeTableName: true,
     modelName: 'RecipeTag',
   });
   return RecipeTag;

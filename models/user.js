@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      // User.hasOne(models.Account)
     }
   }
   User.init({
@@ -25,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
     introduce: DataTypes.STRING
   }, {
     sequelize,
+    freezeTableName: true,
     modelName: 'User',
   });
   return User;

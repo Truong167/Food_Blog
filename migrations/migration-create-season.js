@@ -10,7 +10,8 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       nameOfSeason: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(20),
+        allowNull: false
       },
       createdAt: {
         allowNull: false,

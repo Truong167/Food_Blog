@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     seasonId: DataTypes.INTEGER,
   }, {
     sequelize,
+    freezeTableName: true,
     modelName: 'Month',
   });
   return Month;

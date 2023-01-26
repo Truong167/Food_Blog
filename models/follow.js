@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
     isSeen: DataTypes.BOOLEAN,
   }, {
     sequelize,
+    freezeTableName: true,
     modelName: 'Follow'
   });
   return Follow;

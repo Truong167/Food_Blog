@@ -10,7 +10,12 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       seasonId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Season',
+          key: 'seasonId'
+        },
+        allowNull: false
       },
       createdAt: {
         allowNull: false,

@@ -10,19 +10,21 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       description: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(128),
+        allowNull: false
       },
       image: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(128),
+        allowNull: false,
+        unique: true
       },
       recipeId: {
-        type: Sequelize.INTEGER
-      },
-      email: {
-        type: Sequelize.STRING
-      },
-      introduce: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Recipe',
+          key: 'recipeId',
+        },
+        allowNull: false
       },
       createdAt: {
         allowNull: false,

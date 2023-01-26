@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
     comment: DataTypes.STRING
   }, {
     sequelize,
+    freezeTableName: true,
     modelName: 'Comment'
   });
   return Comment;

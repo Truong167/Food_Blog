@@ -10,10 +10,16 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       description: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(128),
+        allowNull: false
       },
       recipeId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Recipe',
+          key: 'recipeId',
+        },
+        allowNull: false
       },
       createdAt: {
         allowNull: false,
