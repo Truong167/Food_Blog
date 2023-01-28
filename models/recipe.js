@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       Recipe.belongsTo(models.User, {foreignKey: 'userId'});
       Recipe.hasMany(models.Ingredient, {foreignKey: 'recipeId'});
+      Recipe.hasMany(models.Step, {foreignKey: 'recipeId'});
     }
   }
   Recipe.init({

@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Step.belongsTo(models.Recipe, {foreignKey: 'recipeId'})
     }
   }
   Step.init({

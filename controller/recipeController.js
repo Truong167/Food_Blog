@@ -33,7 +33,7 @@ class recipeController {
                 userId: userId
             })
 
-            res.json({success: true, message: 'Thêm thành công'})
+            res.json({success: true, message: 'Successfully added'})
         } catch (error) {
             res.status(500).json({success: false, message: error.message})
         }
@@ -41,15 +41,14 @@ class recipeController {
 
     handleUpdateRecpipe = async (req, res) => {
         try {
-            let { recipeId, name, date, status, amount, prepareTime, cookTime } = req.body
+            let { name, status, amount, prepareTime, cookTime } = req.body
+            let recipeId  = req.params.id
 
-            let recipe = await db.Recipe.findOne({
-                where: {recipeId}
-            })
+            let recipe = await db.Recipe.findByPk(recipeId)
 
             if(recipe) {
                 recipe.recipeName = name
-                recipe.date = date
+                // recipe.date = date
                 recipe.status = status
                 recipe.amount = amount
                 recipe.preparationTime = prepareTime
@@ -69,6 +68,26 @@ class recipeController {
 
     handleDeleteRecipe = async (req, res) => {
         res.json({success: true, message: 'Delete Recipe'})
+    }
+
+    getDetailRecipe = async (req, res) => {
+        try {
+            // Get id in URL
+            // http://localhost:8080/api/v1/recipe/getRecipe/4   id = 4
+            let recipeId  = req.params.id
+            let recipe = await db.Recipe.findByPk(recipeId, {
+                include: [db.Step, db.Ingredient],
+                attributes: ['recipeName', 'cookingTime', 'amount'],
+            })
+            if(recipe) {
+                res.json({success: true, message: 'Step', recipe})
+                return
+            }
+            res.status(500).json({success: false, message: 'Recipe not found'})
+        } catch (error) {
+            res.status(500).json({success: false, message: error.message})
+        }
+
     }
 }
 
