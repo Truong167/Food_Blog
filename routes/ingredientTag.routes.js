@@ -8,6 +8,8 @@ const ingredientTagController = require('../controller/ingredientTagController')
 
 // router.delete('/deleteIngredient/:id', ingredientController.handleDeleteIngredient)
 router.get('/search', ingredientTagController.handleSearchIngredient)
+router.get('/search/:slug', ingredientTagController.handleSearchRecipe)
+
 
 
 

@@ -1,6 +1,5 @@
 
 const db = require('../models/index')
-const sequelize = require('sequelize');
 
 class userController {
     getAllUser = async (req, res) => {

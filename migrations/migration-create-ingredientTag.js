@@ -13,7 +13,7 @@ module.exports = {
         allowNull: false
       },
       image: {
-        type: Sequelize.STRING(128),
+        type: Sequelize.BLOB,
         unique: true,
         allowNull: false
       },

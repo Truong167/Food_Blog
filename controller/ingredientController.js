@@ -1,8 +1,5 @@
 
 const db = require('../models/index')
-const sequelize = require('sequelize')
-
-const { Op } = sequelize
 
 
 class ingredientController {

@@ -50,7 +50,11 @@ module.exports = {
         validate: {
           min: 0,
         },
-        allowNull: false
+        allowNull: false,
+        defaultValue: 0
+      },
+      image: {
+        type: Sequelize.BLOB,
       },
       userId: {
         type: Sequelize.INTEGER,
@@ -68,7 +72,45 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       }
-    });
+    }).
+
+    then(() => queryInterface.addConstraint('Recipe', {
+      fields: ['status'],
+      type: 'check',
+      where: {
+        status: ['RT', 'CK']
+      }
+    })).
+
+    then(() => queryInterface.addConstraint('Recipe', {
+      fields: ['amount'],
+      type: 'check',
+      where: {
+        amount: {
+          [Sequelize.Op.gte]: 1
+        }
+      }
+    })).
+
+    then(() => queryInterface.addConstraint('Recipe', {
+      fields: ['preparationTime'],
+      type: 'check',
+      where: {
+        preparationTime: {
+          [Sequelize.Op.gte]: 1
+        }
+      }
+    })).
+
+    then(() => queryInterface.addConstraint('Recipe', {
+      fields: ['cookingTime'],
+      type: 'check',
+      where: {
+        cookingTime: {
+          [Sequelize.Op.gte]: 1
+        }
+      }
+    }))
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Recipe');

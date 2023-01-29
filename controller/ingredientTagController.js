@@ -31,6 +31,34 @@ class ingredientTagController {
             res.status(500).json({success: false, message: error.message})
         }
     }
+
+
+    handleSearchRecipe = async (req, res) => {
+        try {
+            let { slug } = req.params
+            let ingredient = await db.IngredientTag.findAll({
+                where: {
+                    name: {
+                        [Op.iLike]: slug
+                    }
+                },
+                include:{
+                    model: db.RecipeTag,
+                    include: {
+                        model: db.Recipe
+                    }
+                }
+            })
+            if(ingredient && ingredient.length > 0) {
+                res.json({success: true, message: 'Successfully search', data: ingredient})
+                return
+            }
+            res.json({success: false, message: 'Ingredient not found', })
+        } catch (error) {
+            res.status(500).json({success: false, message: error.message})
+            
+        }
+    }
 }
 
 module.exports = new ingredientTagController

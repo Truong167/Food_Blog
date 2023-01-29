@@ -7,10 +7,13 @@ const recipeController = require('../controller/recipeController')
 
 router.get('/getAllRecipe', recipeController.getAllRecipe)
 router.get('/getRecipe/:id', recipeController.getDetailRecipe)
+router.get('/search', recipeController.handleSearchRecipe)
+
 
 
 router.post('/createRecipe', recipeController.handleCreateRecipe)
 router.put('/updateRecipe/:id', recipeController.handleUpdateRecpipe)
+router.put('/updatePrivacyRecipe/:id/', recipeController.updatePrivacyOfRecipe)
 router.delete('/deleteRecipe', recipeController.handleDeleteRecipe)
 
 

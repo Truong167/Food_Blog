@@ -2,24 +2,28 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Ingredient', {
-      ingredientId: {
+    await queryInterface.createTable('DetailIngredient', {
+      tag: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
-      },
-      description: {
         type: Sequelize.STRING(128),
-        allowNull: false
+        references: {
+          model: 'IngredientTag',
+          key: 'tag'
+        }
       },
       recipeId: {
+        allowNull: false,
+        primaryKey: true,
         type: Sequelize.INTEGER,
         references: {
           model: 'Recipe',
-          key: 'recipeId',
-        },
-        allowNull: false
+          key: 'recipeId'
+        }
+      },
+      description: {
+        allowNull: false,
+        type: Sequelize.STRING(20),
       },
       createdAt: {
         allowNull: false,
@@ -29,9 +33,9 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       }
-    });
+    })
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Ingredient');
+    await queryInterface.dropTable('DetailIngredient');
   }
 };
