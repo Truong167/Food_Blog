@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      DetailIngredient.belongsTo(models.IngredientTag, {foreignKey: 'tag'})
+      DetailIngredient.belongsTo(models.Ingredient, {foreignKey: 'ingredientId'})
       DetailIngredient.belongsTo(models.Recipe, {foreignKey: 'recipeId'})
 
     }
@@ -21,11 +21,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       primaryKey: true,
     },
-    tag: {
+    ingredientId: {
       type: DataTypes.STRING,
       primaryKey: true,
     },
-    description: {
+    amount: {
       type: DataTypes.STRING,
     }
   }, {

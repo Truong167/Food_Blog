@@ -1,11 +1,10 @@
 
 const db = require('../models/index')
 const sequelize = require('sequelize')
-const { response } = require('express')
 const { Op } = sequelize
 
 class recipeController {
-    getAllRecipe = async (req, res) => {
+    getRecipe = async (req, res) => {
         try {
 
             // Select * from Recipe, User where Recipe.userId = User.userId
@@ -75,11 +74,19 @@ class recipeController {
             // http://localhost:8080/api/v1/recipe/getRecipe/4   id = 4
             let recipeId  = req.params.id
             let recipe = await db.Recipe.findByPk(recipeId, {
-                include: [db.Step, db.Ingredient],
-                attributes: ['recipeName', 'cookingTime', 'amount'],
+                include: [
+                {
+                    model: db.DetailIngredient,
+                    include: {
+                        model: db.Ingredient,
+                        attributes: ['name'],
+                    },
+                },
+                {model: db.Step}
+                ],
             })
             if(recipe) {
-                res.json({success: true, message: 'Step', recipe})
+                res.json({success: true, recipe})
                 return
             }
             res.status(500).json({success: false, message: 'Recipe not found'})
@@ -132,6 +139,34 @@ class recipeController {
             }
             res.status(500).json({success: false, message: 'Recipe not found'})
 
+        } catch (error) {
+            res.status(500).json({success: false, message: error.message})
+        }
+    }
+
+    getRecipeByIngredient = async (req, res) => {
+        try {
+            let { slug } = req.params
+            let recipe = await db.Recipe.findAll({
+                include: {
+                    model: db.DetailIngredient,
+                    required: true,
+                    include: { 
+                        model: db.Ingredient,
+                        where: {
+                            name: slug
+                        },
+                        attributes: []
+                    },
+                    attributes: []
+                }
+            })
+            if(recipe && recipe.length > 0) {
+                res.json({success: true, data: recipe})
+                return
+            }
+            res.status(500).json({success: false, message: `Don't have recipe with '${slug}'`})
+            
         } catch (error) {
             res.status(500).json({success: false, message: error.message})
         }

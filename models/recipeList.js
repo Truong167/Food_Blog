@@ -11,11 +11,14 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      RecipeList.hasMany(models.DetailList, {foreignKey: 'recipeListId'})
+      RecipeList.belongsTo(models.User, {foreignKey: 'userId'})
     }
   }
   RecipeList.init({
     recipeListId: {
         type: DataTypes.INTEGER,
+        autoIncrement: true,
         primaryKey: true,
     },
     name: DataTypes.STRING,

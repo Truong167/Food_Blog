@@ -11,6 +11,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Season.hasMany(models.IngredientSeason, {foreignKey: 'seasonId'})
+      Season.hasMany(models.Month, {foreignKey: 'seasonId'})
+
     }
   }
   Season.init({

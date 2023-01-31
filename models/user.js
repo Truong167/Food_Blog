@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
       // User.belongsToMany(models.User, {through: models.Follow, foreignKey: 'userIdFollowed', as: 'followed'})
       User.hasMany(models.Follow, {foreignKey: 'userIdFollow'})
       User.hasMany(models.Follow, {foreignKey: 'userIdFollowed'})
+      User.hasMany(models.RecipeList, {foreignKey: 'userId'})
     }
   }
   User.init({
@@ -28,7 +29,9 @@ module.exports = (sequelize, DataTypes) => {
     dateOfBirth: DataTypes.DATE,
     address: DataTypes.STRING,
     email: DataTypes.STRING,
-    introduce: DataTypes.STRING
+    introduce: DataTypes.STRING,
+    dateUpdatedRecipe: DataTypes.DATE,
+    avatar: DataTypes.STRING,
   }, {
     sequelize,
     freezeTableName: true,

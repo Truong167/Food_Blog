@@ -56,6 +56,9 @@ module.exports = {
       image: {
         type: Sequelize.BLOB,
       },
+      description: {
+        type: Sequelize.STRING(128)
+      },
       userId: {
         type: Sequelize.INTEGER,
         references: {

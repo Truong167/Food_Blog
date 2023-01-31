@@ -29,6 +29,12 @@ module.exports = {
       introduce: {
         type: Sequelize.STRING(128),
       },
+      avatar: { 
+        type: Sequelize.BLOB
+      },
+      dateUpdatedRecipe: {
+        type: Sequelize.DATE
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

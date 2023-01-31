@@ -3,13 +3,13 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('DetailIngredient', {
-      tag: {
+      ingredientId: {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.STRING(128),
         references: {
-          model: 'IngredientTag',
-          key: 'tag'
+          model: 'Ingredient',
+          key: 'ingredientId'
         }
       },
       recipeId: {
@@ -21,7 +21,7 @@ module.exports = {
           key: 'recipeId'
         }
       },
-      description: {
+      amount: {
         allowNull: false,
         type: Sequelize.STRING(20),
       },

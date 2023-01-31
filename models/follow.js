@@ -24,7 +24,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         primaryKey: true,
     },
-    dateUpdate: DataTypes.DATE,
     isSeen: DataTypes.BOOLEAN,
   }, {
     sequelize,

@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class IngredientTag extends Model {
+  class Ingredient extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,13 +11,14 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      IngredientTag.hasMany(models.DetailIngredient, {foreignKey: 'tag'})
-      // IngredientTag.belongsToMany(models.Recipe, {through: models.RecipeTag})
+      Ingredient.hasMany(models.DetailIngredient, {foreignKey: 'ingredientId'});
+      Ingredient.hasMany(models.IngredientSeason, {foreignKey: 'ingredientId'});
+      // Ingredient.belongsToMany(models.Recipe, {through: models.RecipeTag})
 
     }
   }
-  IngredientTag.init({
-    tag: {
+  Ingredient.init({
+    ingredientId: {
       type: DataTypes.STRING,
       primaryKey: true,
     },
@@ -28,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     freezeTableName: true,
-    modelName: 'IngredientTag',
+    modelName: 'Ingredient',
   });
-  return IngredientTag;
+  return Ingredient;
 };

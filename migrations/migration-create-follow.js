@@ -21,10 +21,6 @@ module.exports = {
           key: 'userId',
         }
       },
-      dateUpdate: {
-        type: Sequelize.DATE,
-        allowNull: false
-      },
       isSeen: {
         type: Sequelize.BOOLEAN,
         allowNull: false

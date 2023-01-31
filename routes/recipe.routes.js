@@ -3,11 +3,12 @@ const express = require('express')
 const router = express.Router()
 const recipeController = require('../controller/recipeController')
 
-// http://localhost:8080/api/v1/user
+// http://localhost:8080/api/v1/recipe
 
-router.get('/getAllRecipe', recipeController.getAllRecipe)
+router.get('/getAllRecipe', recipeController.getRecipe)
 router.get('/getRecipe/:id', recipeController.getDetailRecipe)
 router.get('/search', recipeController.handleSearchRecipe)
+router.get('/getRecipeByIngredient/:slug', recipeController.getRecipeByIngredient)
 
 
 

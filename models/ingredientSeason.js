@@ -10,11 +10,14 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
+      IngredientSeason.belongsTo(models.Ingredient, {foreignKey: 'ingredientId'})
+      IngredientSeason.belongsTo(models.Season, {foreignKey: 'seasonId'})
+
       // define association here
     }
   }
   IngredientSeason.init({
-    tag: {
+    ingredientId: {
       type: DataTypes.STRING,
       primaryKey: true
     },

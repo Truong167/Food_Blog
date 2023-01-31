@@ -14,6 +14,8 @@ module.exports = (sequelize, DataTypes) => {
       Recipe.belongsTo(models.User, {foreignKey: 'userId'});
       Recipe.hasMany(models.Step, {foreignKey: 'recipeId'});
       Recipe.hasMany(models.DetailIngredient, {foreignKey: 'recipeId'});
+      Recipe.hasMany(models.DetailList, {foreignKey: 'recipeId'});
+
       // Recipe.belongsToMany(models.IngredientTag, {through: models.RecipeTag})
     }
   }
@@ -56,6 +58,7 @@ module.exports = (sequelize, DataTypes) => {
         }
     },
     image: DataTypes.STRING,
+    description: DataTypes.STRING,
     userId: DataTypes.INTEGER
   }, {
     sequelize,

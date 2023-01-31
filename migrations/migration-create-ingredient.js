@@ -2,8 +2,8 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('IngredientTag', {
-        tag: {
+    await queryInterface.createTable('Ingredient', {
+      ingredientId: {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.STRING(128)
@@ -28,6 +28,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('IngredientTag');
+    await queryInterface.dropTable('Ingredient');
   }
 };
