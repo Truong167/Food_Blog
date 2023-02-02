@@ -3,6 +3,8 @@ const userRouter = require('./user.routes')
 const recipeRouter = require('./recipe.routes')
 const recipeListRouter = require('./recipeList.routes')
 const ingredientRouter = require('./ingredient.routes')
+const commentRouter = require('./comment.routes')
+
 
 
 
@@ -16,6 +18,8 @@ function routes(app){
     app.use('/api/v1/recipe', recipeRouter)
     app.use('/api/v1/recipeList', recipeListRouter)
     app.use('/api/v1/ingredient', ingredientRouter)
+    app.use('/api/v1/comment', commentRouter)
+
 
 
 }

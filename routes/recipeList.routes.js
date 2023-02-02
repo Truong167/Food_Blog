@@ -8,17 +8,13 @@ const recipeListController = require('../controller/recipeListController')
 
 // router.get('/search', recipeListController.handleSearchIngredient)
 
+router.get('/deleteRecipeList/:id', recipeListController.handleDeleteRecipeList)
+
 
 router.post('/createRecipeList', recipeListController.handleCreateRecipeList)
-router.put('/updateRecipeList/:id', recipeListController.handleUpdateRecipeList)
-router.get('/deleteRecipeList/:id', recipeListController.handleDeleteRecipeList)
 router.post('/createRecipe/:id/:idRecipe', recipeListController.handleCreateRecipe)
-
-
-
-
-
-
+router.put('/updateRecipeList/:id', recipeListController.handleUpdateRecipeList)
+router.delete('/deleteRecipe/:id/:idRecipe', recipeListController.handleDeleteRecipe)
 
 
 module.exports = router

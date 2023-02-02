@@ -173,7 +173,7 @@ class recipeController {
                 recipe.status = status
 
                 await recipe.save()
-                res.status(500).json({success: true, message: 'Successfully updated recipe'})
+                res.json({success: true, message: 'Successfully updated recipe'})
                 return
             }
             res.status(500).json({success: false, message: 'Recipe not found'})

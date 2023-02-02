@@ -97,6 +97,22 @@ class recipeListController {
         }
     }
 
+    handleDeleteRecipe = async (req, res) => {
+        try {
+            let { id, idRecipe } = req.params
+            let recipe = await db.DetailList.findOne({where: {recipeListId: id, recipeId: idRecipe}})
+            if(recipe) {
+                await recipe.destroy()
+                res.json({success: true, message: 'Deleted successfully'})
+                return
+            }
+            res.json({success: true, message: 'Recipe not found in detail list'})
+
+        } catch (error) {
+            res.status(500).json({success: false, message: error.message})
+        }
+    }
+
 }
 
 module.exports = new recipeListController
