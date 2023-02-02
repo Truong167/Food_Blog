@@ -23,10 +23,10 @@ class recipeController {
 
     handleCreateRecipe = async (req, res) => {
         try {
-            let { name, date, amount, prepareTime, cookTime, userId } = req.body
+            let { name, amount, prepareTime, cookTime, userId } = req.body
             await db.Recipe.create({
                 recipeName: name,
-                date: date,
+                date: Date.now(),
                 amount: amount,
                 preparationTime: prepareTime,
                 cookingTime: cookTime,
@@ -65,7 +65,46 @@ class recipeController {
     }
 
     handleDeleteRecipe = async (req, res) => {
-        res.json({success: true, message: 'Delete Recipe'})
+        try {
+            let { id } = req.params
+            let recipe = await db.Recipe.findByPk(id)
+            if(recipe) {
+                const prm0 = new Promise((resolve, rejects) => {
+                    let x = db.DetailList.destroy({where: {recipeId: id}})
+                    resolve(x)
+                })
+                const prm1 = new Promise((resolve, rejects) => {
+                    let x = db.Favorite.destroy({where: {recipeId: id}})
+                    resolve(x)
+                })
+                const prm2 = new Promise((resolve, rejects) => {
+                    let x = db.Comment.destroy({where: {recipeId: id}})
+                    resolve(x)
+                })
+                const prm3 = new Promise((resolve, rejects) => {
+                    let x = db.Step.destroy({where: {recipeId: id}})
+                    resolve(x)
+                })
+                const prm4 = new Promise((resolve, rejects) => {
+                    let x = db.DetailIngredient.destroy({where: {recipeId: id}})
+                    resolve(x)
+                })
+                const prm5 = new Promise((resolve, rejects) => {
+                    let x = recipe.destroy()
+                    resolve(x)
+                })
+
+                await Promise.all([prm0, prm1, prm2, prm3, prm4, prm5])
+
+                res.json({success: true, message: 'Successfully deleted recipe'})
+                return
+            }
+            res.json({success: false, message: 'Recipe not found'})
+
+
+        } catch (error) {
+            res.status(500).json({success: false, message: error.message})
+        }
     }
 
     getDetailRecipe = async (req, res) => {
@@ -172,5 +211,8 @@ class recipeController {
         }
     }
 }
+
+
+// Create, update, delete recipe need to fix
 
 module.exports = new recipeController

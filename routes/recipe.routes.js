@@ -14,8 +14,8 @@ router.get('/getRecipeByIngredient/:slug', recipeController.getRecipeByIngredien
 
 router.post('/createRecipe', recipeController.handleCreateRecipe)
 router.put('/updateRecipe/:id', recipeController.handleUpdateRecpipe)
-router.put('/updatePrivacyRecipe/:id/', recipeController.updatePrivacyOfRecipe)
-router.delete('/deleteRecipe', recipeController.handleDeleteRecipe)
+router.put('/updatePrivacyRecipe/:id', recipeController.updatePrivacyOfRecipe)
+router.delete('/deleteRecipe/:id', recipeController.handleDeleteRecipe)
 
 
 

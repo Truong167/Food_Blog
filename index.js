@@ -17,7 +17,7 @@ routes(app)
 connectDb()
 
 
-app.listen(PORT, () => console.log(`Serving on port ${PORT}`))
+app.listen(PORT, () => console.log(`Server listening on port ${PORT}`))
 
 
 

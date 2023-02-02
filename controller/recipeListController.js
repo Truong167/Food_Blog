@@ -77,6 +77,26 @@ class recipeListController {
 
     }
 
+    handleCreateRecipe = async (req, res) => {
+        try {
+            let { id, idRecipe } = req.params
+            let recipe = await db.Recipe.findByPk(idRecipe)
+            if(recipe) {
+                await db.DetailList.create({
+                    recipeListId: id,
+                    recipeId: idRecipe,
+                    date: Date.now()
+                })
+                res.json({success: true, message: 'Recipe created successfully'})
+                return
+            }
+            res.json({success: true, message: 'Recipe not found'})
+
+        } catch (error) {
+            res.status(500).json({success: false, message: error.message})
+        }
+    }
+
 }
 
 module.exports = new recipeListController
