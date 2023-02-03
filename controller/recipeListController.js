@@ -1,30 +1,51 @@
 
 const db = require('../models/index')
-const sequelize = require('sequelize')
-
-const { Op } = sequelize
 
 
 class recipeListController {
     
     handleCreateRecipeList = async (req, res) => {
+        let { name } = req.body
+        if(!name) {
+            res.status(400).json({
+                success: false,
+                message: 'Missing request data',
+                data: null,
+            })
+            return
+        }
         try {
-            let { name, userId } = req.body
+            let { userId } = req.params
             await db.RecipeList.create({
                 name: name,
                 date: Date.now(),
                 userId: userId
             })
-            
-            res.json({success: true, message: 'Successfully added'})
+            res.status(200).json({
+                success: false,
+                message: `Recipe list saved successfully.`,
+                data: recipeList,
+              });
         } catch (error) {
-            res.status(500).json({success: false, message: error.message})
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: null
+            })
         }
     }
 
     handleUpdateRecipeList = async (req, res) => {
+        let { name } = req.body
+        if(!name) {
+            res.status(400).json({
+                success: false,
+                message: 'Missing request data',
+                data: null,
+            })
+            return
+        }
         try {
-            let { name } = req.body
             let { id } = req.params
             let recipeList = await db.RecipeList.findByPk(id)
 
@@ -33,14 +54,26 @@ class recipeListController {
 
                 await recipeList.save()
 
-                res.json({success: true, message: 'Successfully updated recipe list'})
+                res.status(200).json({
+                    success: true,
+                    message: 'Successfully updated recipe list',
+                    data: recipeList
+                })
                 return
             }
 
-            res.json({success: false, message: 'Recipe list not found'})
+            res.status(400).json({
+                success: false,
+                message: 'Recipe list not found',
+                data: null
+            })
 
         } catch (error) {
-            res.status(500).json({success: false, message: error.message})
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: null
+            })
         }
     }
 
@@ -79,37 +112,61 @@ class recipeListController {
 
     handleCreateRecipe = async (req, res) => {
         try {
-            let { id, idRecipe } = req.params
-            let recipe = await db.Recipe.findByPk(idRecipe)
+            let { recipeListId, recipeId } = req.params
+            let recipe = await db.Recipe.findByPk(recipeId)
             if(recipe) {
-                await db.DetailList.create({
-                    recipeListId: id,
-                    recipeId: idRecipe,
+                let detailList = await db.DetailList.create({
+                    recipeListId: recipeListId,
+                    recipeId: recipeId,
                     date: Date.now()
                 })
-                res.json({success: true, message: 'Recipe created successfully'})
+                res.status(200).json({
+                    success: true, 
+                    message: 'Recipe created successfully',
+                    data: detailList
+                })
                 return
             }
-            res.json({success: true, message: 'Recipe not found'})
+            res.status(400).json({
+                success: true,
+                message: 'Recipe not found',
+                data: null
+            })
 
         } catch (error) {
-            res.status(500).json({success: false, message: error.message})
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: null
+            })
         }
     }
 
     handleDeleteRecipe = async (req, res) => {
         try {
-            let { id, idRecipe } = req.params
-            let recipe = await db.DetailList.findOne({where: {recipeListId: id, recipeId: idRecipe}})
+            let { recipeListId, recipeId } = req.params
+            let recipe = await db.DetailList.findOne({where: {recipeListId: recipeListId, recipeId: recipeId}})
             if(recipe) {
-                await recipe.destroy()
-                res.json({success: true, message: 'Deleted successfully'})
+                let detailList = await recipe.destroy()
+                res.status(200).json({
+                    success: true,
+                    message: 'Deleted successfully',
+                    data: detailList
+                })
                 return
             }
-            res.json({success: true, message: 'Recipe not found in detail list'})
+            res.status(400).json({
+                success: true, 
+                message: 'Recipe not found in detail list',
+                data: null
+            })
 
         } catch (error) {
-            res.status(500).json({success: false, message: error.message})
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: null
+            })
         }
     }
 

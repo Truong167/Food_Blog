@@ -13,29 +13,57 @@ class recipeController {
                 include: [db.User],
                 attributes: {
                     exclude: ['createdAt']
-                }
+                },
+                order: [['date', 'DESC']]
             })
-            res.json({success: true, data: data})
+            res.status(200).json({
+                success: true,
+                message: 'Successfully get data',
+                data: data
+            })
         } catch (error) {
-            res.status(500).json({success: false, message: error.message})
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: null
+            })
         }
     }
 
     handleCreateRecipe = async (req, res) => {
+        let { name, amount, status, prepareTime, cookTime } = req.body
+        if(!name || !amount || !prepareTime || !cookTime || !status) {
+            res.status(400).json({
+                status: false,
+                message: 'Missing request data',
+                data: null
+            })
+            return
+        }
+
         try {
-            let { name, amount, prepareTime, cookTime, userId } = req.body
-            await db.Recipe.create({
+            let { userId } = req.params
+            let recipe = await db.Recipe.create({
                 recipeName: name,
                 date: Date.now(),
                 amount: amount,
+                status: status,
                 preparationTime: prepareTime,
                 cookingTime: cookTime,
                 userId: userId
             })
 
-            res.json({success: true, message: 'Successfully added'})
+            res.status(200).json({
+                success: true, 
+                message: 'Successfully added',
+                data: recipe
+            })
         } catch (error) {
-            res.status(500).json({success: false, message: error.message})
+            res.status(500).json({
+                success: false, 
+                message: error.message, 
+                data: null
+            })
         }
     }
 
@@ -152,13 +180,25 @@ class recipeController {
             })
 
             if(recipe && recipe.length > 0){
-                res.json({success: true, data: recipe})
+                res.status(200).json({
+                    success: true,
+                    message: 'Successfully search',
+                    data: recipe
+                })
                 return
             }
 
-            res.status(500).json({success: false, message: 'Recipe not found'})
+            res.status(400).json({
+                success: false, 
+                message: 'Recipe not found',
+                data: null
+            })
         } catch (error) {
-            res.status(500).json({success: false, message: error.message})
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: null
+            })
         }
     }
 
@@ -172,14 +212,26 @@ class recipeController {
             if(recipe) {
                 recipe.status = status
 
-                await recipe.save()
-                res.json({success: true, message: 'Successfully updated recipe'})
+                let recipeData = await recipe.save()
+                res.status(200).json({
+                    success: true,
+                    message: 'Successfully updated recipe',
+                    data: recipeData
+                })
                 return
             }
-            res.status(500).json({success: false, message: 'Recipe not found'})
+            res.status(400).json({
+                success: false, 
+                message: 'Recipe not found',
+                data: null
+            })
 
         } catch (error) {
-            res.status(500).json({success: false, message: error.message})
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: null
+            })
         }
     }
 
@@ -201,18 +253,28 @@ class recipeController {
                 }
             })
             if(recipe && recipe.length > 0) {
-                res.json({success: true, data: recipe})
+                res.status(200).json({
+                    success: true,
+                    message: 'Successfully get data',
+                    data: recipe
+                })
                 return
             }
-            res.status(500).json({success: false, message: `Don't have recipe with '${slug}'`})
+            res.status(400).json({
+                success: false, 
+                message: `Don't have recipe with '${slug}'`,
+                data: null
+            })
             
         } catch (error) {
-            res.status(500).json({success: false, message: error.message})
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: null
+            })
         }
     }
 }
 
-
-// Create, update, delete recipe need to fix
 
 module.exports = new recipeController

@@ -6,7 +6,7 @@ const commentController = require('../controller/commentController')
 // http://localhost:8080/api/v1/comment/
 
 router.get('/', commentController.index)
-router.post('/createComment/:id', commentController.handleCreateComment)
+router.post('/createComment/:userId/:recipeId', commentController.handleCreateComment)
 router.put('/updateComment/:userId/:recipeId', commentController.handleUpdateComment)
 router.delete('/deleteComment/:userId/:recipeId', commentController.handleDeleteComment)
 

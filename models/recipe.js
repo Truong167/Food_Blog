@@ -27,7 +27,12 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
     },
     recipeName: DataTypes.STRING,
-    date: DataTypes.DATE,
+    date: {
+      type: DataTypes.DATE,
+      get: function() {
+        return require('moment').utc(this.getDataValue('date')).local().format('DD-MM-YYYY hh:mm:ss A');
+      }
+    },
     status: {
         type: DataTypes.STRING,
         validate: {

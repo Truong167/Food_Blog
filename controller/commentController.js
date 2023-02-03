@@ -8,22 +8,34 @@ class commentController {
 
     handleCreateComment = async (req, res) => {
         try {
-            let { id } = req.params
-            let { comment, userId } = req.body
+            let { recipeId, userId } = req.params
+            let { comment } = req.body
             let recipe = db.Recipe.findByPk(id)
             if(recipe) {
-                await db.Comment.create({
+                let commentData = await db.Comment.create({
                     userId: userId,
-                    recipeId: id,
+                    recipeId: recipeId,
                     date: Date.now(),
                     comment: comment
                 })
-                res.json({success: true, message: 'Successfully added'})
+                res.status(200).json({
+                    success: true, 
+                    message: 'Successfully added',
+                    data: commentData
+                })
                 return
             }
-            res.json({success: false, message: 'Recipe not found'})
+            res.status(400).json({
+                success: false,
+                message: 'Recipe not found',
+                data: null
+            })
         } catch (error) {
-            res.status(500).json({success: false, message: error.message})
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: null
+            })
         }
     }
 
@@ -34,13 +46,25 @@ class commentController {
             let commentData = await db.Comment.findOne({where: {userId: userId, recipeId: recipeId}})
             if(commentData) {
                 commentData.comment = comment
-                await commentData.save()
-                res.json({success: true, message: 'Successfully updated comment'})
+                let data = await commentData.save()
+                res.status(200).json({
+                    success: true, 
+                    message: 'Successfully updated comment',
+                    data: data
+                })
                 return
             }
-            res.json({success: false, message: 'Comment not found'})
+            res.status(400).json({
+                success: false, 
+                message: 'Comment not found',
+                data: null
+            })
         } catch (error) {
-            res.status(500).json({success: false, message: error.message})
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: null
+            })
         }
     }
 
@@ -49,13 +73,25 @@ class commentController {
             let { userId, recipeId } = req.params
             let comment = await db.Comment.findOne({where: {userId: userId, recipeId: recipeId}})
             if(comment) {
-                await comment.destroy()
-                res.json({success: true, message: 'Successfully deleted comment'})
+                let commentData = await comment.destroy()
+                res.status(200).json({
+                    success: true, 
+                    message: 'Successfully deleted comment',
+                    data: commentData
+                })
                 return
             }
-            res.json({success: false, message: 'Comment not found'})
+            res.status(400).json({
+                success: false, 
+                message: 'Comment not found',
+                data: null
+            })
         } catch (error) {
-            res.status(500).json({success: false, message: error.message})
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: null
+            })
         }
     }
 }

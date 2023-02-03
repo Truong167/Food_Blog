@@ -22,13 +22,25 @@ class ingredientController {
             })
             
             if(ingredient && ingredient.length > 0) {
-                res.json({success: true, message: 'Successfully search', data: ingredient})
+                res.status(200).json({
+                    success: true, 
+                    message: 'Successfully search', 
+                    data: ingredient
+                })
                 return
             }
-            res.json({success: false, message: 'Ingredient not found', })
+            res.status(400).json({
+                success: false, 
+                message: 'Ingredient not found',
+                data: null
+            })
             
         } catch (error) {
-            res.status(500).json({success: false, message: error.message})
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: null
+            })
         }
     }
 
@@ -56,13 +68,24 @@ class ingredientController {
                 }]
             })
             if(ingredient && ingredient.length > 0){
-                res.json({success: true, data: ingredient})
+                res.status(200).json({
+                    success: true, 
+                    message: 'Successfully get data',
+                    data: ingredient
+                })
                 return
             }
-            res.json({success: false, message: 'Ingredient not found'})
-
+            res.status(400).json({
+                success: false, 
+                message: 'Ingredient not found',
+                data: null
+            })
         } catch (error) {
-            res.status(500).json({success: false, message: error.message})
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: null
+            })
         }
     }
 }
