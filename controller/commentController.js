@@ -28,13 +28,11 @@ class commentController {
             res.status(400).json({
                 success: false,
                 message: 'Recipe not found',
-                data: null
             })
         } catch (error) {
             res.status(500).json({
                 success: false, 
                 message: error.message,
-                data: null
             })
         }
     }
@@ -57,13 +55,11 @@ class commentController {
             res.status(400).json({
                 success: false, 
                 message: 'Comment not found',
-                data: null
             })
         } catch (error) {
             res.status(500).json({
                 success: false, 
                 message: error.message,
-                data: null
             })
         }
     }
@@ -84,13 +80,11 @@ class commentController {
             res.status(400).json({
                 success: false, 
                 message: 'Comment not found',
-                data: null
             })
         } catch (error) {
             res.status(500).json({
                 success: false, 
                 message: error.message,
-                data: null
             })
         }
     }

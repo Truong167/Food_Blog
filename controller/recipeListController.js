@@ -10,7 +10,6 @@ class recipeListController {
             res.status(400).json({
                 success: false,
                 message: 'Missing request data',
-                data: null,
             })
             return
         }
@@ -30,7 +29,6 @@ class recipeListController {
             res.status(500).json({
                 success: false, 
                 message: error.message,
-                data: null
             })
         }
     }
@@ -41,7 +39,6 @@ class recipeListController {
             res.status(400).json({
                 success: false,
                 message: 'Missing request data',
-                data: null,
             })
             return
         }
@@ -65,14 +62,12 @@ class recipeListController {
             res.status(400).json({
                 success: false,
                 message: 'Recipe list not found',
-                data: null
             })
 
         } catch (error) {
             res.status(500).json({
                 success: false, 
                 message: error.message,
-                data: null
             })
         }
     }
@@ -130,14 +125,12 @@ class recipeListController {
             res.status(400).json({
                 success: true,
                 message: 'Recipe not found',
-                data: null
             })
 
         } catch (error) {
             res.status(500).json({
                 success: false, 
                 message: error.message,
-                data: null
             })
         }
     }
@@ -158,14 +151,12 @@ class recipeListController {
             res.status(400).json({
                 success: true, 
                 message: 'Recipe not found in detail list',
-                data: null
             })
 
         } catch (error) {
             res.status(500).json({
                 success: false, 
                 message: error.message,
-                data: null
             })
         }
     }

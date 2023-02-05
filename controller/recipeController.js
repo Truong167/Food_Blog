@@ -25,7 +25,6 @@ class recipeController {
             res.status(500).json({
                 success: false, 
                 message: error.message,
-                data: null
             })
         }
     }
@@ -36,7 +35,6 @@ class recipeController {
             res.status(400).json({
                 status: false,
                 message: 'Missing request data',
-                data: null
             })
             return
         }
@@ -62,7 +60,6 @@ class recipeController {
             res.status(500).json({
                 success: false, 
                 message: error.message, 
-                data: null
             })
         }
     }
@@ -153,10 +150,17 @@ class recipeController {
                 ],
             })
             if(recipe) {
-                res.json({success: true, recipe})
+                res.json({
+                    success: true,
+                    message: "Successfully get data",
+                    data: recipe
+                })
                 return
             }
-            res.status(500).json({success: false, message: 'Recipe not found'})
+            res.status(400).json({
+                success: false, 
+                message: 'Recipe not found'
+            })
         } catch (error) {
             res.status(500).json({success: false, message: error.message})
         }
@@ -191,13 +195,11 @@ class recipeController {
             res.status(400).json({
                 success: false, 
                 message: 'Recipe not found',
-                data: null
             })
         } catch (error) {
             res.status(500).json({
                 success: false, 
                 message: error.message,
-                data: null
             })
         }
     }
@@ -223,14 +225,12 @@ class recipeController {
             res.status(400).json({
                 success: false, 
                 message: 'Recipe not found',
-                data: null
             })
 
         } catch (error) {
             res.status(500).json({
                 success: false, 
                 message: error.message,
-                data: null
             })
         }
     }
@@ -263,14 +263,12 @@ class recipeController {
             res.status(400).json({
                 success: false, 
                 message: `Don't have recipe with '${slug}'`,
-                data: null
             })
             
         } catch (error) {
             res.status(500).json({
                 success: false, 
                 message: error.message,
-                data: null
             })
         }
     }
