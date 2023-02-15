@@ -14,7 +14,7 @@ class recipeListController {
             return
         }
         try {
-            let { userId } = req.params
+            let userId = req.userId
             await db.RecipeList.create({
                 name: name,
                 date: Date.now(),

@@ -34,7 +34,7 @@ class recipeController {
         if(!name || !amount || !prepareTime || !cookTime || !status) {
             res.status(400).json({
                 status: false,
-                message: 'Missing request data',
+                message: 'Please provide all required fields',
             })
             return
         }
@@ -240,8 +240,8 @@ class recipeController {
             let { slug } = req.params
             let recipe = await db.Recipe.findAll({
                 include: {
-                    model: db.DetailIngredient,
                     required: true,
+                    model: db.DetailIngredient,
                     include: { 
                         model: db.Ingredient,
                         where: {
@@ -271,6 +271,10 @@ class recipeController {
                 message: error.message,
             })
         }
+    }
+
+    getPopularRecipe = async (req, res) => {
+        
     }
 }
 

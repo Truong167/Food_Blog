@@ -8,7 +8,8 @@ class commentController {
 
     handleCreateComment = async (req, res) => {
         try {
-            let { recipeId, userId } = req.params
+            let { recipeId } = req.params
+            let userId = req.userId
             let { comment } = req.body
             let recipe = db.Recipe.findByPk(id)
             if(recipe) {
@@ -39,7 +40,8 @@ class commentController {
 
     handleUpdateComment = async (req, res) => {
         try {
-            let { userId, recipeId } = req.params
+            let { recipeId } = req.params
+            let userId = req.userId
             let { comment } = req.body
             let commentData = await db.Comment.findOne({where: {userId: userId, recipeId: recipeId}})
             if(commentData) {
@@ -66,7 +68,8 @@ class commentController {
 
     handleDeleteComment = async (req, res) => {
         try {
-            let { userId, recipeId } = req.params
+            let { recipeId } = req.params
+            let userId = req.userId
             let comment = await db.Comment.findOne({where: {userId: userId, recipeId: recipeId}})
             if(comment) {
                 let commentData = await comment.destroy()
@@ -90,6 +93,5 @@ class commentController {
     }
 }
 
-// Create, update, delete recipe need to fix
 
 module.exports = new commentController

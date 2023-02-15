@@ -8,11 +8,11 @@ class followController {
 
     handleCreateFollow = async (req, res) => {
         try {
-            let { userIdFollow, userIdFollowed } = req.params
+            let { userIdFollowed } = req.params
             let user = await db.User.findByPk(userIdFollowed)
             if(user) {
                 let follow = await db.Follow.create({
-                    userIdFollow: userIdFollow,
+                    userIdFollow: req.userId,
                     userIdFollowed: userIdFollowed,
                     isSeen: false
                 })
@@ -37,10 +37,10 @@ class followController {
 
     handleDeleteFollow = async (req, res) => {
         try {
-            let { userIdFollow, userIdFollowed } = req.params
+            let { userIdFollowed } = req.params
             let follow = await db.Follow.findOne({
                 where: {
-                    userIdFollow: userIdFollow, 
+                    userIdFollow: req.userId, 
                     userIdFollowed: userIdFollowed,
                 }
             })

@@ -8,7 +8,8 @@ class favoriteController {
 
     handleCreateFavorite = async (req, res) => {
         try {
-            let { recipeId, userId } = req.params
+            let { recipeId } = req.params
+            let userId = req.userId
             let recipe = await db.Recipe.findByPk(recipeId)
             if(recipe) {
                 let favorite = await db.Favorite.create({
@@ -37,7 +38,8 @@ class favoriteController {
 
     handleDeleteFavorite = async (req, res) => {
         try {
-            let { recipeId, userId } = req.params
+            let { recipeId } = req.params
+            let userId = req.userId
             let favorite = await db.Favorite.findOne({where: {userId: userId, recipeId: recipeId}})
             if(favorite) {
                 let favoriteData = await favorite.destroy()
