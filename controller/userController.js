@@ -7,12 +7,20 @@ const {
     checkAccountExists
 } = require('../middlewares/validator')
 const {sequelize} = require('../models/index')
+const {
+    toBase64,
+    handleImage
+} = require('../middlewares/utils/handleImage')
+
 
 class userController {
+
     getAllUser = async (req, res) => {
         try {
-            // Select * from User
             let data = await db.User.findAll()
+            for(let i = 0; i < data.length; i++) {
+                data[i].dataValues.avatar = handleImage(data[i].dataValues.avatar)
+            }
             res.json({success: true, data: data})
         } catch (error) {
             res.status(500).json({success: false, message: error.message})
@@ -32,8 +40,8 @@ class userController {
                     },
                 ],
             })
-
             if(user) {
+                user.dataValues.avatar = handleImage(user.dataValues.avatar)
                 let count = await db.Recipe.count({where: {userId: id}})
                 let count1 = await db.Follow.count({where: {userIdFollowed: id}})
     

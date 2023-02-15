@@ -59,7 +59,7 @@ class authController {
             })
         } else {
             try {
-                const result = await sequelize.transaction(async t => {
+                await sequelize.transaction(async t => {
                     let user = await db.User.create({
                         fullName: fullName,
                         dateOfBirth: dateOfBirth,
@@ -68,12 +68,11 @@ class authController {
                         introduce: introduce ? introduce : null,
                         avatar: avatar ? avatar : null
                     }, { transaction: t })
-                    let account = await db.Account.create({
+                    await db.Account.create({
                         accountName: accountName,
                         password: bcrypt.hashSync(password, 10),
                         userId: user.userId
                     }, { transaction: t })
-                    return {user, account}
                 })
 
                 // const accessToken = jwt.sign({userId: result.user.userId}, process.env.ACCESS_TOKEN_SECRET)

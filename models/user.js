@@ -2,6 +2,7 @@
 const {
   Model
 } = require('sequelize');
+const formatDate = require('../middlewares/utils/formatDate')
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -32,11 +33,21 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
     },
     fullName: DataTypes.STRING,
-    dateOfBirth: DataTypes.DATE,
+    dateOfBirth: {
+      type: DataTypes.DATE,
+      get: function() {
+        return formatDate(this.getDataValue('dateOfBirth'))
+      }
+    },
     address: DataTypes.STRING,
     email: DataTypes.STRING,
     introduce: DataTypes.STRING,
-    dateUpdatedRecipe: DataTypes.DATE,
+    dateUpdatedRecipe: {
+      type: DataTypes.DATE,
+      get: function() {
+        return formatDate(this.getDataValue('dateUpdatedRecipe'))
+      }
+    },
     avatar: DataTypes.STRING,
   }, {
     sequelize,

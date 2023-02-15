@@ -2,6 +2,7 @@
 const {
   Model
 } = require('sequelize');
+const formatDate = require('../middlewares/utils/formatDate');
 module.exports = (sequelize, DataTypes) => {
   class Recipe extends Model {
     /**
@@ -30,7 +31,7 @@ module.exports = (sequelize, DataTypes) => {
     date: {
       type: DataTypes.DATE,
       get: function() {
-        return require('moment').utc(this.getDataValue('date')).local().format('DD-MM-YYYY hh:mm:ss A');
+        return formatDate(this.getDataValue('date'))
       }
     },
     status: {

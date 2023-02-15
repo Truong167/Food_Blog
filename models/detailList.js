@@ -2,6 +2,7 @@
 const {
   Model
 } = require('sequelize');
+const formatDate = require('../middlewares/utils/formatDate');
 module.exports = (sequelize, DataTypes) => {
   class DetailList extends Model {
     /**
@@ -24,7 +25,12 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         primaryKey: true,
     },
-    date: DataTypes.DATE,
+    date: {
+      type: DataTypes.DATE,
+      get: function() {
+        return formatDate(this.getDataValue(date))
+      }
+    }
   }, {
     sequelize,
     freezeTableName: true,
