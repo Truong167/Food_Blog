@@ -1,16 +1,9 @@
-const bcrypt = require('bcryptjs')
 const db = require('../models/index')
 const {
     checkEmailExists,
-    validateEmail,
-    validatePassword,
-    checkAccountExists
 } = require('../middlewares/validator')
 const {sequelize} = require('../models/index')
-const {
-    toBase64,
-    handleImage
-} = require('../middlewares/utils/handleImage')
+require('dotenv').config()
 
 
 class userController {
@@ -19,7 +12,11 @@ class userController {
         try {
             let data = await db.User.findAll()
             for(let i = 0; i < data.length; i++) {
-                data[i].dataValues.avatar = handleImage(data[i].dataValues.avatar)
+                if(data[i].dataValues.avatar == null){
+                    data[i].dataValues.avatar = process.env.URL + 'user/no_avatar.png'
+                } else {
+                    data[i].dataValues.avatar = process.env.URL + data[i].dataValues.avatar
+                }
             }
             res.json({
                 success: true, 
@@ -49,11 +46,15 @@ class userController {
                 ],
             })
             if(user) {
-                user.dataValues.avatar = handleImage(user.dataValues.avatar)
-                let count = await db.Recipe.count({where: {userId: id}})
-                let count1 = await db.Follow.count({where: {userIdFollowed: id}})
-                // let newData = {...user, count, count1}
-                res.status(200).json({success: true, data: user})
+                user.dataValues.avatar = process.env.URL + user.dataValues.avatar
+                let countRecipe = await db.Recipe.count({where: {userId: id}})
+                let countFollow = await db.Follow.count({where: {userIdFollowed: id}})
+                let newData = [{user, countRecipe: countRecipe, countFollow: countFollow}]
+                res.status(200).json({
+                    success: true, 
+                    message: "Successfully get data", 
+                    data: newData
+                })
                 return
             }
             res.status(400).json({
@@ -79,7 +80,8 @@ class userController {
         if(!fullName || !dateOfBirth || !address || !email) {
             res.status(400).json({
                 success: false,
-                message: "Please provide all required fields"
+                message: "Please provide all required fields",
+                data: ""
             })
             return
         }

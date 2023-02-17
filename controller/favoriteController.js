@@ -68,6 +68,5 @@ class favoriteController {
 
 }
 
-// Create, update, delete recipe need to fix
 
 module.exports = new favoriteController

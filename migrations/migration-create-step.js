@@ -14,7 +14,7 @@ module.exports = {
         allowNull: false
       },
       image: {
-        type: Sequelize.BLOB,
+        type: Sequelize.STRING(128),
         allowNull: false,
         unique: true
       },

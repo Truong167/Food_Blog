@@ -30,7 +30,7 @@ module.exports = {
         type: Sequelize.STRING(128),
       },
       avatar: { 
-        type: Sequelize.BLOB
+        type: Sequelize.STRING(128)
       },
       dateUpdatedRecipe: {
         type: Sequelize.DATE

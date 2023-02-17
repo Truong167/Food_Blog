@@ -54,7 +54,7 @@ module.exports = {
         defaultValue: 0
       },
       image: {
-        type: Sequelize.BLOB,
+        type: Sequelize.STRING(128),
       },
       description: {
         type: Sequelize.STRING(128)
