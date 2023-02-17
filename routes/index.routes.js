@@ -24,7 +24,7 @@ function routes(app){
     app.use('/api/v1/comment',verifyToken, commentRouter)
     app.use('/api/v1/favorite',verifyToken, favoriteRouter)
     app.use('/api/v1/follow',verifyToken, followRouter)
-    app.use('/api/v1/auth',verifyToken, authRouter)
+    app.use('/api/v1/auth', authRouter)
 }
 
 module.exports = routes

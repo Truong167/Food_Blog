@@ -25,6 +25,7 @@ class recipeController {
             res.status(500).json({
                 success: false, 
                 message: error.message,
+                data: ""
             })
         }
     }
@@ -35,6 +36,7 @@ class recipeController {
             res.status(400).json({
                 status: false,
                 message: 'Please provide all required fields',
+                data: ""
             })
             return
         }
@@ -60,6 +62,7 @@ class recipeController {
             res.status(500).json({
                 success: false, 
                 message: error.message, 
+                data: ""
             })
         }
     }
@@ -79,13 +82,25 @@ class recipeController {
 
                 await recipe.save()
 
-                res.json({success: true, message: 'Successfully updated recipe'})
+                res.json({
+                    success: true, 
+                    message: 'Successfully updated recipe',
+                    data: ""
+                })
             } else {
-                res.json({success: false, message: 'Recipe not found'})
+                res.json({
+                    success: false, 
+                    message: 'Recipe not found',
+                    data: ""
+                })
             }
 
         } catch (error) {
-            res.status(500).json({success: false, message: error.message})
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: ""
+            })
         }
     }
 
@@ -121,14 +136,26 @@ class recipeController {
 
                 await Promise.all([prm0, prm1, prm2, prm3, prm4, prm5])
 
-                res.json({success: true, message: 'Successfully deleted recipe'})
+                res.json({
+                    success: true, 
+                    message: 'Successfully deleted recipe',
+                    data: ""
+                })
                 return
             }
-            res.json({success: false, message: 'Recipe not found'})
+            res.json({
+                success: false,
+                message: 'Recipe not found',
+                data: ""
+            })
 
 
         } catch (error) {
-            res.status(500).json({success: false, message: error.message})
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: ""
+            })
         }
     }
 
@@ -159,10 +186,15 @@ class recipeController {
             }
             res.status(400).json({
                 success: false, 
-                message: 'Recipe not found'
+                message: 'Recipe not found',
+                data: ""
             })
         } catch (error) {
-            res.status(500).json({success: false, message: error.message})
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: ""
+            })
         }
 
     }
@@ -195,11 +227,13 @@ class recipeController {
             res.status(400).json({
                 success: false, 
                 message: 'Recipe not found',
+                data: ""
             })
         } catch (error) {
             res.status(500).json({
                 success: false, 
                 message: error.message,
+                data: ""
             })
         }
     }
@@ -225,12 +259,14 @@ class recipeController {
             res.status(400).json({
                 success: false, 
                 message: 'Recipe not found',
+                data: ""
             })
 
         } catch (error) {
             res.status(500).json({
                 success: false, 
                 message: error.message,
+                data: ""
             })
         }
     }
@@ -263,12 +299,14 @@ class recipeController {
             res.status(400).json({
                 success: false, 
                 message: `Don't have recipe with '${slug}'`,
+                data: ""
             })
             
         } catch (error) {
             res.status(500).json({
                 success: false, 
                 message: error.message,
+                data: ""
             })
         }
     }

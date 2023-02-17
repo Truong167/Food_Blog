@@ -1,7 +1,7 @@
-
+require('dotenv').config()
 
 const  handleImage = file => {
-    let img = 'http://localhost:8080/image/no_avatar.png'
+    let img = `http://localhost:${process.env.PORT}/image/no_avatar.png`
     if(file){
         img = new Buffer(file, 'base64').toString('binary')
     }

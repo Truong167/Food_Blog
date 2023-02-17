@@ -14,7 +14,7 @@ class authController {
     
     handleRegister = async (req, res) => {
 
-        const { fullName, dateOfBirth, address, email, introduce, avatar, accountName, password, password2 } = req.body
+        const { fullName, email, accountName, password, password2 } = req.body
 
         const prm0 = new Promise((resolve, rejects) => {
             let x = checkEmailExists(email)
@@ -26,53 +26,56 @@ class authController {
         })
         let x = await Promise.all([prm0, prm1])
         let [emailCheck, accountCheck] = [...x]
-        if(!fullName || !dateOfBirth || !address || !email || !accountName || !password || !password2){
+        if(!fullName || !email || !accountName || !password || !password2){
             res.status(400).json({
                 success: false,
                 message: 'Please provide all required fields',
+                data: ""
             })
         } else if( password != password2){
             res.status(400).json({
                 success: false,
                 message: 'The entered passwords do not match',
+                data: ""
             })
         } else if(!validatePassword(password)){
             res.status(400).json({
                 success: false,
                 message:
                   'Your password must be at least 6 characters long and contain a lowercase letter, an uppercase letter, a numeric digit and a special character.',
+                data: ""
               })
         } else if(!validateEmail(email)){
             res.status(400).json({
                 success: false,
                 message: 'Email address has invalid format',
+                data: ""
             })
         } else if(emailCheck){
             res.status(400).json({
                 success: false,
                 message: 'Email already exists',
+                data: ""
             })
         } else if(accountCheck){
             res.status(400).json({
                 success: false,
                 message: 'Account already exists',
+                data: ""
             })
         } else {
             try {
-                await sequelize.transaction(async t => {
+                const result = await sequelize.transaction(async t => {
                     let user = await db.User.create({
                         fullName: fullName,
-                        dateOfBirth: dateOfBirth,
-                        address: address,
                         email: email,
-                        introduce: introduce ? introduce : null,
-                        avatar: avatar ? avatar : null
                     }, { transaction: t })
                     await db.Account.create({
                         accountName: accountName,
                         password: bcrypt.hashSync(password, 10),
                         userId: user.userId
                     }, { transaction: t })
+                    return user
                 })
 
                 // const accessToken = jwt.sign({userId: result.user.userId}, process.env.ACCESS_TOKEN_SECRET)
@@ -80,11 +83,13 @@ class authController {
                 res.status(201).json({
                     success: true,
                     message: 'Successfully register',
+                    data: result
                 });
             } catch (error) {
                 res.status(500).json({
                     success: false,
                     message: error.message,
+                    data: ""
                 })
             }
         }
@@ -119,8 +124,7 @@ class authController {
             res.status(200).json({
                 success: true,
                 message: 'Successfully logged in',
-                data: account.accountName,
-                accessToken
+                data: accessToken
             })
         } catch (error) {
             res.status(500).json({

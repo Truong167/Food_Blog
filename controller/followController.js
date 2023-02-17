@@ -26,11 +26,13 @@ class followController {
             res.status(400).json({
                 success: false, 
                 message: 'User not found',
+                data: ""
             })
         } catch (error) {
             res.status(500).json({
                 success: false, 
                 message: error.message,
+                data: ""
             })
         }
     }
@@ -56,11 +58,13 @@ class followController {
             res.status(400).json({
                 success: false, 
                 message: 'Follow not found',
+                data: ""
             })
         } catch (error) {
             res.status(500).json({
                 success: false, 
                 message: error.message,
+                data: ""
             })
         }
     }

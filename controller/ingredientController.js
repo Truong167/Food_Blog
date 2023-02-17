@@ -32,12 +32,14 @@ class ingredientController {
             res.status(400).json({
                 success: false, 
                 message: 'Ingredient not found',
+                data: ""
             })
             
         } catch (error) {
             res.status(500).json({
                 success: false, 
                 message: error.message,
+                data: ""
             })
         }
     }
@@ -76,11 +78,13 @@ class ingredientController {
             res.status(400).json({
                 success: false, 
                 message: 'Ingredient not found',
+                data: ""
             })
         } catch (error) {
             res.status(500).json({
                 success: false, 
                 message: error.message,
+                data: ""
             })
         }
     }
