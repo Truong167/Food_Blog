@@ -27,10 +27,10 @@ module.exports = (sequelize, DataTypes) => {
   }
   User.init({
     userId: {
-      allowNull: false,
+      // allowNull: false,
+      primaryKey: true,
       autoIncrement: true,
       type: DataTypes.INTEGER,
-      primaryKey: true,
     },
     fullName: DataTypes.STRING,
     dateOfBirth: {

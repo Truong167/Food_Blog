@@ -12,6 +12,20 @@ require('dotenv').config()
 
 class authController {
     
+    handleCheckLogin = async (req, res) => {
+        try {
+            const user = await db.User.findByPk(req.userId)
+            if(!user) return res.status(400).json({success: false, message: 'User not found', data: ''})
+            res.status(200).json({success: true, message: 'Successfully', data: user.userId})
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: error.message,
+                data: ""
+            })
+        }
+    }
+
     handleRegister = async (req, res) => {
 
         const { fullName, email, accountName, password, password2 } = req.body
@@ -88,7 +102,7 @@ class authController {
             } catch (error) {
                 res.status(500).json({
                     success: false,
-                    message: error.message,
+                    message: error,
                     data: ""
                 })
             }
