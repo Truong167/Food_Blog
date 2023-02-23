@@ -23,7 +23,7 @@ class followController {
                 })
                 return
             }
-            res.status(400).json({
+            res.status(426).json({
                 success: false, 
                 message: 'User not found',
                 data: ""
@@ -55,7 +55,7 @@ class followController {
                 })
                 return
             }
-            res.status(400).json({
+            res.status(435).json({
                 success: false, 
                 message: 'Follow not found',
                 data: ""

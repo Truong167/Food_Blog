@@ -16,8 +16,9 @@ module.exports = (sequelize, DataTypes) => {
   }
   Step.init({
     stepId: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
+      primaryKey: true,
+      autoIncrement: true,
+      type: DataTypes.INTEGER,
     },
     description: DataTypes.STRING,
     image: DataTypes.STRING,

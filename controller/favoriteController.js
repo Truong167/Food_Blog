@@ -24,7 +24,7 @@ class favoriteController {
                 })
                 return
             }
-            res.status(400).json({
+            res.status(432).json({
                 success: false, 
                 message: 'Recipe not found',
                 data: ""
@@ -52,7 +52,7 @@ class favoriteController {
                 })
                 return
             }
-            res.status(400).json({
+            res.status(432).json({
                 success: false, 
                 message: 'Recipe not found',
                 data: ""

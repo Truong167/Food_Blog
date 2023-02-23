@@ -10,6 +10,7 @@ router.get('/getAllRecipe', recipeController.getRecipe)
 router.get('/getRecipe/:id', recipeController.getDetailRecipe)
 router.get('/search', recipeController.handleSearchRecipe)
 router.get('/getRecipeByIngredient/:slug', recipeController.getRecipeByIngredient)
+router.get('/getPopularRecipe', recipeController.getPopularRecipe)
 
 
 
@@ -17,6 +18,7 @@ router.post('/createRecipe', recipeController.handleCreateRecipe)
 router.put('/updateRecipe/:id', recipeController.handleUpdateRecpipe)
 router.put('/updatePrivacyRecipe/:id', recipeController.updatePrivacyOfRecipe)
 router.delete('/deleteRecipe/:id', recipeController.handleDeleteRecipe)
+
 
 
 

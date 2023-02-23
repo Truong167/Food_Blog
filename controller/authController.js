@@ -41,38 +41,38 @@ class authController {
         let x = await Promise.all([prm0, prm1])
         let [emailCheck, accountCheck] = [...x]
         if(!fullName || !email || !accountName || !password || !password2){
-            res.status(400).json({
+            res.status(418).json({
                 success: false,
                 message: 'Please provide all required fields',
                 data: ""
             })
         } else if( password != password2){
-            res.status(400).json({
+            res.status(419).json({
                 success: false,
                 message: 'The entered passwords do not match',
                 data: ""
             })
         } else if(!validatePassword(password)){
-            res.status(400).json({
+            res.status(420).json({
                 success: false,
                 message:
                   'Your password must be at least 6 characters long and contain a lowercase letter, an uppercase letter, a numeric digit and a special character.',
                 data: ""
               })
         } else if(!validateEmail(email)){
-            res.status(400).json({
+            res.status(421).json({
                 success: false,
                 message: 'Email address has invalid format',
                 data: ""
             })
         } else if(emailCheck){
-            res.status(400).json({
+            res.status(422).json({
                 success: false,
                 message: 'Email already exists',
                 data: ""
             })
         } else if(accountCheck){
-            res.status(400).json({
+            res.status(423).json({
                 success: false,
                 message: 'Account already exists',
                 data: ""
@@ -112,24 +112,27 @@ class authController {
     handleLogin = async (req, res) => {
         const { accountName, password } = req.body
         if(!accountName || !password) {
-            res.status(400).json({
+            res.status(418).json({
                 success: false,
                 message: 'Please all provide required fields',
+                data: ""
             })
             return
         }
         try {
             let account = await db.Account.findByPk(accountName)
             if(!account)
-            return res.status(400).json({
+            return res.status(424).json({
                 success: false,
                 message: 'Account does not exist',
+                data: ""
             })
             const pass = await bcrypt.compare(password, account.password)
             if(!pass)
-            return  res.status(400).json({
+            return  res.status(425).json({
                 success: false,
                 message: 'Password do not match',
+                data: ""
             })
 
             const accessToken = jwt.sign({userId: account.userId}, process.env.ACCESS_TOKEN_SECRET, {
@@ -144,6 +147,7 @@ class authController {
             res.status(500).json({
                 success: false,
                 message: error.message,
+                data: ""
             })
         }
     }

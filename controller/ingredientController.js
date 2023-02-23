@@ -75,7 +75,7 @@ class ingredientController {
                 })
                 return
             }
-            res.status(400).json({
+            res.status(427).json({
                 success: false, 
                 message: 'Ingredient not found',
                 data: ""

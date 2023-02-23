@@ -7,7 +7,7 @@ class recipeListController {
     handleCreateRecipeList = async (req, res) => {
         let { name } = req.body
         if(!name) {
-            res.status(400).json({
+            res.status(418).json({
                 success: false,
                 message: 'Missing request data',
                 data: ""
@@ -22,10 +22,10 @@ class recipeListController {
                 userId: userId
             })
             res.status(200).json({
-                success: false,
+                success: true,
                 message: `Recipe list saved successfully.`,
                 data: recipeList,
-              });
+              })
         } catch (error) {
             res.status(500).json({
                 success: false, 
@@ -38,7 +38,7 @@ class recipeListController {
     handleUpdateRecipeList = async (req, res) => {
         let { name } = req.body
         if(!name) {
-            res.status(400).json({
+            res.status(418).json({
                 success: false,
                 message: 'Missing request data',
                 data: ""
@@ -62,7 +62,7 @@ class recipeListController {
                 return
             }
 
-            res.status(400).json({
+            res.status(433).json({
                 success: false,
                 message: 'Recipe list not found',
                 data: ""
@@ -98,7 +98,7 @@ class recipeListController {
                 // await detailList.destroy()
                 await recipeList.destroy()
 
-                res.json({
+                res.status(200).json({
                     success: true, 
                     message: 'Successfully deleted recipe list',
                     data: ""
@@ -106,7 +106,7 @@ class recipeListController {
                 return
             }
 
-            res.json({
+            res.status(433).json({
                 success: false, 
                 message: 'Recipe list not found',
                 data: ""
@@ -139,9 +139,10 @@ class recipeListController {
                 })
                 return
             }
-            res.status(400).json({
+            res.status(432).json({
                 success: true,
                 message: 'Recipe not found',
+                data: ""
             })
 
         } catch (error) {
@@ -166,9 +167,9 @@ class recipeListController {
                 })
                 return
             }
-            res.status(400).json({
+            res.status(432).json({
                 success: true, 
-                message: 'Recipe not found in detail list',
+                message: 'Recipe not found',
                 data: ""
             })
 

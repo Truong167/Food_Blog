@@ -23,9 +23,9 @@ module.exports = (sequelize, DataTypes) => {
   }
   Recipe.init({
     recipeId: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
+      primaryKey: true,
+      autoIncrement: true,
+      type: DataTypes.INTEGER,
     },
     recipeName: DataTypes.STRING,
     date: {

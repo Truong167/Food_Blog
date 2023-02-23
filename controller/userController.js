@@ -43,13 +43,22 @@ class userController {
                         limit: 3,
                         order: [['numberOfLikes', 'DESC']],
                     },
+                    {
+                        model: db.Follow,
+                        attributes: []
+                    },
                 ],
+                attributes: {
+                    include: [
+                        [sequelize.fn('COUNT', sequelize.col('Follows.userIdFollowed')), 'follow']
+                    ]
+                },
+                group: ['User.userId']
             })
             if(user) {
                 user.dataValues.avatar = process.env.URL + user.dataValues.avatar
                 let countRecipe = await db.Recipe.count({where: {userId: id}})
-                let countFollow = await db.Follow.count({where: {userIdFollowed: id}})
-                let newData = [{user, countRecipe: countRecipe, countFollow: countFollow}]
+                let newData = [{user, countRecipe: countRecipe}]
                 res.status(200).json({
                     success: true, 
                     message: "Successfully get data", 
@@ -57,7 +66,7 @@ class userController {
                 })
                 return
             }
-            res.status(400).json({
+            res.status(426).json({
                 success: false, 
                 message: 'User not found',
                 data: ""
@@ -78,7 +87,7 @@ class userController {
         const emailCheck = await checkEmailExists(email, userId)
         console.log(emailCheck)
         if(!fullName || !dateOfBirth || !address || !email) {
-            res.status(400).json({
+            res.status(418).json({
                 success: false,
                 message: "Please provide all required fields",
                 data: ""
@@ -86,7 +95,7 @@ class userController {
             return
         }
         if(emailCheck) {
-            res.status(400).json({
+            res.status(422).json({
                 success: false,
                 message: "Email already exists ",
                 data: ""

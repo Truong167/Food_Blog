@@ -26,7 +26,7 @@ class commentController {
                 })
                 return
             }
-            res.status(400).json({
+            res.status(432).json({
                 success: false,
                 message: 'Recipe not found',
                 data: ""
@@ -56,7 +56,7 @@ class commentController {
                 })
                 return
             }
-            res.status(400).json({
+            res.status(434).json({
                 success: false, 
                 message: 'Comment not found',
                 data: ""
@@ -84,7 +84,7 @@ class commentController {
                 })
                 return
             }
-            res.status(400).json({
+            res.status(434).json({
                 success: false, 
                 message: 'Comment not found',
                 data: ""

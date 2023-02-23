@@ -1,7 +1,8 @@
 
 const db = require('../models/index')
-const sequelize = require('sequelize')
-const { Op } = sequelize
+const {sequelize} = require('../models/index')
+const Sequelize = require('sequelize')
+const { Op } = Sequelize
 
 class recipeController {
     getRecipe = async (req, res) => {
@@ -16,10 +17,17 @@ class recipeController {
                 },
                 order: [['date', 'DESC']]
             })
-            res.status(200).json({
-                success: true,
-                message: 'Successfully get data',
-                data: data
+            if(data && data.length > 0) {
+                return res.status(200).json({
+                    success: true,
+                    message: 'Successfully get data',
+                    data: data
+                })
+            }
+            res.status(429).json({
+                success: false, 
+                message: "Don't have recipe",
+                data: ""
             })
         } catch (error) {
             res.status(500).json({
@@ -31,9 +39,9 @@ class recipeController {
     }
 
     handleCreateRecipe = async (req, res) => {
-        let { name, amount, status, prepareTime, cookTime } = req.body
+        let { name, amount, status, prepareTime, cookTime, ingredient, step } = req.body
         if(!name || !amount || !prepareTime || !cookTime || !status) {
-            res.status(400).json({
+            res.status(418).json({
                 status: false,
                 message: 'Please provide all required fields',
                 data: ""
@@ -42,26 +50,38 @@ class recipeController {
         }
 
         try {
-            let { userId } = req.params
-            let recipe = await db.Recipe.create({
-                recipeName: name,
-                date: Date.now(),
-                amount: amount,
-                status: status,
-                preparationTime: prepareTime,
-                cookingTime: cookTime,
-                userId: userId
+            let  userId = req.userId
+            const result = await sequelize.transaction(async t => {
+                let recipe = await db.Recipe.create({
+                    recipeName: name,
+                    date: Date.now(),
+                    amount: amount,
+                    status: status,
+                    preparationTime: prepareTime,
+                    cookingTime: cookTime,
+                    userId: userId
+                }, { transaction: t })
+                ingredient = ingredient.map(item => {
+                    item.recipeId = recipe.recipeId
+                    return item
+                })
+                step = step.map(item => {
+                    item.recipeId = recipe.recipeId
+                    return item
+                })
+                let ingre = await db.DetailIngredient.bulkCreate(ingredient, { transaction: t })
+                let stepRes = await db.Step.bulkCreate(step, { transaction: t })
+                return {recipe, ingre, stepRes}
             })
-
             res.status(200).json({
                 success: true, 
                 message: 'Successfully added',
-                data: recipe
+                data: result
             })
         } catch (error) {
             res.status(500).json({
                 success: false, 
-                message: error.message, 
+                message: error, 
                 data: ""
             })
         }
@@ -82,13 +102,13 @@ class recipeController {
 
                 await recipe.save()
 
-                res.json({
+                res.status(200).json({
                     success: true, 
                     message: 'Successfully updated recipe',
                     data: ""
                 })
             } else {
-                res.json({
+                res.status(432).json({
                     success: false, 
                     message: 'Recipe not found',
                     data: ""
@@ -98,7 +118,7 @@ class recipeController {
         } catch (error) {
             res.status(500).json({
                 success: false, 
-                message: error.message,
+                message: error,
                 data: ""
             })
         }
@@ -136,14 +156,14 @@ class recipeController {
 
                 await Promise.all([prm0, prm1, prm2, prm3, prm4, prm5])
 
-                res.json({
+                res.status(200).json({
                     success: true, 
                     message: 'Successfully deleted recipe',
                     data: ""
                 })
                 return
             }
-            res.json({
+            res.status(432).json({
                 success: false,
                 message: 'Recipe not found',
                 data: ""
@@ -184,7 +204,7 @@ class recipeController {
                 })
                 return
             }
-            res.status(400).json({
+            res.status(432).json({
                 success: false, 
                 message: 'Recipe not found',
                 data: ""
@@ -224,7 +244,7 @@ class recipeController {
                 return
             }
 
-            res.status(400).json({
+            res.status(432).json({
                 success: false, 
                 message: 'Recipe not found',
                 data: ""
@@ -256,7 +276,7 @@ class recipeController {
                 })
                 return
             }
-            res.status(400).json({
+            res.status(432).json({
                 success: false, 
                 message: 'Recipe not found',
                 data: ""
@@ -296,7 +316,7 @@ class recipeController {
                 })
                 return
             }
-            res.status(400).json({
+            res.status(428).json({
                 success: false, 
                 message: `Don't have recipe with '${slug}'`,
                 data: ""
@@ -312,7 +332,58 @@ class recipeController {
     }
 
     getPopularRecipe = async (req, res) => {
-        
+        let today = new Date()
+        var newDate = new Date(today.getTime() - (60*60*24*7*1000))
+        console.log(today)
+        try {
+            let recipe = await db.Recipe.findAll({
+                where: {
+                    date: {
+                        // [Op.between]: ['2023-02-24', '2022-01-01']
+                        [Op.lt]: today,
+                        [Op.gt]: newDate
+                    }
+                    
+                },
+                include: [
+                    {   
+                        require: true,
+                        duplicating: false,
+                        model: db.Comment,
+                        attributes: []
+                    },
+                ],
+                attributes: {
+                    include: [
+                        [sequelize.fn('COUNT', sequelize.col('Comments.recipeId')), 'count']
+                    ],
+                },
+                group: ['Recipe.recipeId'],
+                order: [
+                    ['numberOfLikes', 'DESC'],
+                    ['count', 'DESC'],
+                    ['date', 'ASC']
+                ]
+            })
+            if(recipe && recipe.length > 0) {
+                return res.status(200).json({
+                    success: true,
+                    message: "Successfully get data",
+                    data: recipe
+                })
+            }
+            res.status(432).json({
+                success: false,
+                message: "Recipe not found",
+                data: ""
+            })
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: error.message,
+                data: ""
+            })
+        }
     }
 }
 
