@@ -25,6 +25,15 @@ function routes(app){
     app.use('/api/v1/favorite',verifyToken, favoriteRouter)
     app.use('/api/v1/follow',verifyToken, followRouter)
     app.use('/api/v1/auth', authRouter)
+
+    // app.use('/api/v1/user', userRouter)
+    // app.use('/api/v1/recipe', recipeRouter)
+    // app.use('/api/v1/recipeList', recipeListRouter)
+    // app.use('/api/v1/ingredient', ingredientRouter)
+    // app.use('/api/v1/comment', commentRouter)
+    // app.use('/api/v1/favorite', favoriteRouter)
+    // app.use('/api/v1/follow', followRouter)
+    // app.use('/api/v1/auth', authRouter)
 }
 
 module.exports = routes
