@@ -11,13 +11,6 @@ class userController {
     getAllUser = async (req, res) => {
         try {
             let data = await db.User.findAll()
-            for(let i = 0; i < data.length; i++) {
-                if(data[i].dataValues.avatar == null){
-                    data[i].dataValues.avatar = process.env.URL + 'user/no_avatar.png'
-                } else {
-                    data[i].dataValues.avatar = process.env.URL + data[i].dataValues.avatar
-                }
-            }
             res.json({
                 success: true, 
                 message: "Successfully get data",
@@ -56,7 +49,6 @@ class userController {
                 group: ['User.userId']
             })
             if(user) {
-                user.dataValues.avatar = process.env.URL + user.dataValues.avatar
                 let countRecipe = await db.Recipe.count({where: {userId: id}})
                 let newData = [{user, countRecipe: countRecipe}]
                 res.status(200).json({

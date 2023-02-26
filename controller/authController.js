@@ -16,7 +16,7 @@ class authController {
         try {
             const user = await db.User.findByPk(req.userId)
             if(!user) return res.status(400).json({success: false, message: 'User not found', data: ''})
-            res.status(200).json({success: true, message: 'Successfully', data: user.userId})
+            res.status(200).json({success: true, message: 'Successfully', data: user})
         } catch (error) {
             res.status(500).json({
                 success: false,
