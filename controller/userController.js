@@ -1,9 +1,12 @@
 const db = require('../models/index')
+let multerConfig = require("../middlewares/utils/multerConfig");
+
 const {
     checkEmailExists,
 } = require('../middlewares/validator')
 const {sequelize} = require('../models/index')
 require('dotenv').config()
+
 
 
 class userController {
@@ -74,56 +77,71 @@ class userController {
     }
 
     handleUpdateUser = async (req, res) => {
-        const { fullName, dateOfBirth, address, email, introduce, avatar } = req.body
         const userId  = req.userId
-        const emailCheck = await checkEmailExists(email, userId)
-        console.log(emailCheck)
-        if(!fullName || !dateOfBirth || !address || !email) {
-            res.status(418).json({
-                success: false,
-                message: "Please provide all required fields",
-                data: ""
-            })
-            return
-        }
-        if(emailCheck) {
-            res.status(422).json({
-                success: false,
-                message: "Email already exists ",
-                data: ""
-            })
-            return
-        }
-        try {
-            let user = await db.User.findByPk(userId)
-            if(user) {
-                user.fullName = fullName
-                user.dateOfBirth = dateOfBirth
-                user.address = address
-                user.email = email
-                let updated = await user.save()
-
-                res.status(200).json({
-                    success: true,
-                    message: "Successfully updated",
-                    data: updated
+        let uploadFile = multerConfig('public/image/user', userId)
+        uploadFile( req, res, async (error) => {
+            const { fullName, dateOfBirth, address, email, introduce, } = req.body
+            const emailCheck = await checkEmailExists(email, userId)
+            console.log(emailCheck)
+            if(error) {
+                return res.status(440).json({
+                    success: false, 
+                    message: `Error when trying to upload: ${error}`,
+                    data: ""
+                });
+            }
+            if(!fullName || !dateOfBirth || !address || !email) {
+                res.status(418).json({
+                    success: false,
+                    message: "Please provide all required fields",
+                    data: ""
+                })
+                return
+            }
+            if(emailCheck) {
+                res.status(422).json({
+                    success: false,
+                    message: "Email already exists ",
+                    data: ""
                 })
                 return
             }
 
-            res.status(400).json({
-                success: false,
-                message: "User not found",
-                data: ""
-            })
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: error.message,
-                data: ""
-            })
-        }
+            try {
+                let user = await db.User.findByPk(userId)
+                if(user) {
+                    user.fullName = fullName
+                    user.dateOfBirth = dateOfBirth
+                    user.address = address
+                    user.email = email
+                    user.avatar = req.file ? `/user/${req.file.filename}` : null
+                    user.introduce = introduce ? introduce : ''
+                    
+                    let updated = await user.save()
+    
+                    res.status(200).json({
+                        success: true,
+                        message: "Successfully updated",
+                        data: updated
+                    })
+                    return
+                }
+    
+                res.status(400).json({
+                    success: false,
+                    message: "User not found",
+                    data: ""
+                })
+            } catch (error) {
+                res.status(500).json({
+                    success: false,
+                    message: error.message,
+                    data: ""
+                })
+            }
+        })
     }
+
 }
 
 module.exports = new userController

@@ -34,7 +34,7 @@ function routes(app){
     // app.use('/api/v1/favorite', favoriteRouter)
     // app.use('/api/v1/follow', followRouter)
     // app.use('/api/v1/auth', authRouter)
-    app.use('/', (req, res) => { res.send("Đây là Food Blog Web Services") });
+    app.use('/', (req, res) => {res.send({ message: 'Đây là Food Blog Web Services' })});
 }
 
 module.exports = routes
