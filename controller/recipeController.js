@@ -311,7 +311,7 @@ class recipeController {
                     },
                     {
                         model: db.User,
-                        attributes: ["fullName", "avatar"]
+                        attributes: ["fullName", "avatar", "userId"]
                     }
                 ],
                 attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image"]
