@@ -314,7 +314,7 @@ class recipeController {
                         attributes: ["fullName", "avatar"]
                     }
                 ],
-                attributes: ["recipeId", "recipeName", "date", "numberOfLikes"]
+                attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image"]
             })
             if(recipe && recipe.length > 0) {
                 res.status(200).json({
