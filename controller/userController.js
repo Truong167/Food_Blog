@@ -77,12 +77,11 @@ class userController {
     }
 
     handleUpdateUser = async (req, res) => {
-        const userId  = req.userId
+        const userId  = 3
         let uploadFile = multerConfig('public/image/user', userId)
         uploadFile( req, res, async (error) => {
             const { fullName, dateOfBirth, address, email, introduce, } = req.body
             const emailCheck = await checkEmailExists(email, userId)
-            console.log(emailCheck)
             if(error) {
                 return res.status(440).json({
                     success: false, 

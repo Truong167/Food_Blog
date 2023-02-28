@@ -6,12 +6,51 @@ class commentController {
         res.send('comments')
     }
 
+    getCommentOfRecipe = async (req, res) => {
+        try {
+            let {recipeId} = req.params
+            let recipe = await db.Recipe.findByPk(recipeId)
+            if(recipe) {
+                let comment = await db.Comment.findAll({
+                    where: {
+                        recipeId: recipeId
+                    },
+                    include: {
+                        model: db.User,
+                        attributes: ["fullName", "avatar"]
+                    },
+                    attributes: {exclude: ["createdAt", "updatedAt"]}
+                })
+                let commentCount = await db.Comment.count({where: {recipeId: recipeId}})
+                let newData = [{comment, commentCount: commentCount}]
+                res.status(200).json({
+                    success: true, 
+                    message: 'Successfully added',
+                    data: newData
+                })
+                return
+            }
+
+            res.status(432).json({
+                success: false,
+                message: 'Recipe not found',
+                data: ""
+            })
+        } catch(error) {
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: ""
+            })
+        }
+    }
+
     handleCreateComment = async (req, res) => {
         try {
             let { recipeId } = req.params
             let userId = req.userId
             let { comment } = req.body
-            let recipe = db.Recipe.findByPk(id)
+            let recipe = await db.Recipe.findByPk(id)
             if(recipe) {
                 let commentData = await db.Comment.create({
                     userId: userId,

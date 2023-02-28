@@ -188,13 +188,22 @@ class recipeController {
                 include: [
                 {
                     model: db.DetailIngredient,
+                    attributes: {exclude: ["createdAt", "updatedAt", "recipeId"]},
                     include: {
                         model: db.Ingredient,
-                        attributes: ['name'],
+                        attributes: ["name"],
                     },
                 },
-                {model: db.Step}
+                {
+                    model: db.Step,
+                    attributes: {exclude: ["createdAt", "updatedAt", "recipeId"]}
+                },
+                {
+                    model: db.User,
+                    attributes: ["userId", "fullName", "avatar"]
+                }
                 ],
+                attributes: {exclude: ["createdAt", "updatedAt"]}
             })
             if(recipe) {
                 res.json({
