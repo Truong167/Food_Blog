@@ -295,18 +295,26 @@ class recipeController {
         try {
             let { slug } = req.params
             let recipe = await db.Recipe.findAll({
-                include: {
-                    required: true,
-                    model: db.DetailIngredient,
-                    include: { 
-                        model: db.Ingredient,
-                        where: {
-                            name: slug
+                include: [ 
+                    {
+                        required: true,
+                        model: db.User,
+                        model: db.DetailIngredient,
+                        include: { 
+                            model: db.Ingredient,
+                            where: {
+                                name: slug
+                            },
+                            attributes: []
                         },
-                        attributes: []
+                        attributes: [],
                     },
-                    attributes: []
-                }
+                    {
+                        model: db.User,
+                        attributes: ["fullName", "avatar"]
+                    }
+                ],
+                attributes: ["recipeId", "recipeName", "date", "numberOfLikes"]
             })
             if(recipe && recipe.length > 0) {
                 res.status(200).json({
