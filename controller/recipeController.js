@@ -184,32 +184,44 @@ class recipeController {
             // Get id in URL
             // http://localhost:8080/api/v1/recipe/getRecipe/4   id = 4
             let recipeId  = req.params.id
-            let recipe = await db.Recipe.findByPk(recipeId, {
-                include: [
-                {
-                    model: db.DetailIngredient,
-                    attributes: {exclude: ["createdAt", "updatedAt", "recipeId"]},
-                    include: {
-                        model: db.Ingredient,
-                        attributes: ["name"],
+            const prm0 = new Promise((resolve, rejects) => {
+                let x = db.Recipe.findByPk(recipeId, {
+                    include: [
+                    {
+                        model: db.Step,
+                        attributes: {exclude: ["createdAt", "updatedAt", "recipeId"]}
                     },
-                },
-                {
-                    model: db.Step,
-                    attributes: {exclude: ["createdAt", "updatedAt", "recipeId"]}
-                },
-                {
-                    model: db.User,
-                    attributes: ["userId", "fullName", "avatar"]
-                }
-                ],
-                attributes: {exclude: ["createdAt", "updatedAt"]}
+                    {
+                        model: db.User,
+                        attributes: ["userId", "fullName", "avatar"]
+                    }
+                    ],
+                    attributes: {exclude: ["createdAt", "updatedAt"]}
+                })
+                resolve(x)
             })
+            const prm1 = new Promise((resolve, rejects) => {
+                let x =  db.DetailIngredient.findAll({
+                    where: {
+                        recipeId: recipeId
+                    },
+                    include: 
+                    {
+                        model: db.Ingredient,
+                        attributes: []
+                    },
+                    attributes: ["amount", [Sequelize.col('name'), "ingredientName"]]
+                })
+                resolve(x)
+            })
+            let x = await Promise.all([prm0, prm1])
+            let [recipe, ingredient] = [...x]
+            let newData = [{recipe, ingredient: ingredient}]
             if(recipe) {
                 res.json({
                     success: true,
                     message: "Successfully get data",
-                    data: recipe
+                    data: newData,
                 })
                 return
             }
