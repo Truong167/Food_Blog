@@ -25,7 +25,7 @@ class commentController {
                 let newData = [{comment, commentCount: commentCount}]
                 res.status(200).json({
                     success: true, 
-                    message: 'Successfully added',
+                    message: 'Successfully get data',
                     data: newData
                 })
                 return
@@ -39,7 +39,7 @@ class commentController {
         } catch(error) {
             res.status(500).json({
                 success: false, 
-                message: error.message,
+                message: error,
                 data: ""
             })
         }
