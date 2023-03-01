@@ -10,12 +10,12 @@ class recipeController {
 
             // Select * from Recipe, User where Recipe.userId = User.userId
             let data = await db.Recipe.findAll({
-                // where: {userId: 2},
-                include: [db.User],
-                attributes: {
-                    exclude: ['createdAt']
+                include: {
+                    model: db.User,
+                    attributes: ["fullName", "avatar", "userId"]
                 },
-                order: [['date', 'DESC']]
+                attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image"],
+                order: [["date", 'DESC']]
             })
             if(data && data.length > 0) {
                 return res.status(200).json({
@@ -406,6 +406,57 @@ class recipeController {
                 message: "Recipe not found",
                 data: ""
             })
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: error.message,
+                data: ""
+            })
+        }
+    }
+
+    getRecipeFromFollowers = async (req, res) => {
+        try {
+            const userId = req.userId
+            // const userId = 3
+            let followers = await db.Follow.findAll({
+                where: {
+                    userIdFollow: userId,
+                    isSeen: false
+                },
+                attributes: ["userIdFollowed"]
+            })
+            if(followers && followers.length == 0) {
+                res.status(200).json({
+                    success: false,
+                    message: "User do not follow anyone",
+                    data: "",
+                })
+                return
+            }
+            let newFollowerData = []
+            followers.map(item => newFollowerData.push(item.dataValues.userIdFollowed))
+            let recipe = await db.Recipe.findAll({
+                where: {
+                    userId: {
+                        [Op.or]: [newFollowerData]
+                    }
+                },
+                include: {
+                    model: db.User,
+                    attributes: ["fullName", "avatar", "userId"]
+                },
+                    attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image"],
+                    order: [["date", 'DESC']]
+            })
+            if(recipe && recipe.length > 0 ){
+                res.status(200).json({
+                    success: true,
+                    message: "Successfully get data",
+                    data: recipe,
+                })
+                return
+            }
         } catch (error) {
             res.status(500).json({
                 success: false,

@@ -50,7 +50,7 @@ class commentController {
             let { recipeId } = req.params
             let userId = req.userId
             let { comment } = req.body
-            let recipe = await db.Recipe.findByPk(id)
+            let recipe = await db.Recipe.findByPk(recipeId)
             if(recipe) {
                 let commentData = await db.Comment.create({
                     userId: userId,
