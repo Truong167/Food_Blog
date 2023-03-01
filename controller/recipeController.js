@@ -216,7 +216,7 @@ class recipeController {
             })
             let x = await Promise.all([prm0, prm1])
             let [recipe, ingredient] = [...x]
-            let newData = [{recipe, ingredient: ingredient}]
+            let newData = {recipe, ingredient}
             if(recipe) {
                 res.json({
                     success: true,
