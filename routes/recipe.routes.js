@@ -13,6 +13,7 @@ router.get('/getRecipeByIngredient/:slug', recipeController.getRecipeByIngredien
 router.get('/getPopularRecipe', recipeController.getPopularRecipe)
 router.get('/getRecipeFromFollowers', recipeController.getRecipeFromFollowers)
 router.get('/getRecipeByName/:slug', recipeController.handleGetRecipeByName)
+router.get('/getRecipeByUserId/:userId', recipeController.getRecipeByUserId)
 
 
 

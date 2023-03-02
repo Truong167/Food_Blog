@@ -503,6 +503,38 @@ class recipeController {
             })
         }
     }
+
+    getRecipeByUserId = async (req, res) => {
+        try {
+            const userId = req.params.userId
+            const recipe = await db.Recipe.findAll({
+                where: {
+                    userId: userId
+                },
+                order: [["date", "DESC"]],
+                attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image", "status"]
+            })
+            if(recipe && recipe.length > 0) {
+                res.status(200).json({
+                    success: true,
+                    message: "Successfully get data",
+                    data: recipe
+                })
+                return
+            }
+            res.status(432).json({
+                success: true,
+                message: "Recipe not found",
+                data: recipe
+            })
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: error,
+                data: ""
+            })
+        }
+    }
 }
 
 

@@ -35,25 +35,34 @@ class userController {
                 include: [
                     {
                         model: db.Recipe,
-                        attributes: ['recipeName', 'numberOfLikes'],
+                        attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image", "status"],
                         limit: 3,
-                        order: [['numberOfLikes', 'DESC']],
+                        order: [['date', 'DESC']],
                     },
                     {
                         model: db.Follow,
                         attributes: []
                     },
                 ],
-                attributes: {
-                    include: [
-                        [sequelize.fn('COUNT', sequelize.col('Follows.userIdFollowed')), 'follow']
-                    ]
-                },
-                group: ['User.userId']
+                attributes: {exclude: ["dateUpdatedRecipe", "createdAt", "updatedAt"]}
             })
             if(user) {
-                let countRecipe = await db.Recipe.count({where: {userId: id}})
-                let newData = {user, countRecipe: countRecipe}
+                const prm0 = new Promise((resolve, rejects) => {
+                    let x = db.Recipe.count({where: {userId: id}})
+                    resolve(x)
+                })
+                const prm1 = new Promise((resolve, rejects) => {
+                    let x = db.Follow.count({where: {userIdFollow: id}})
+                    resolve(x)
+                })
+                const prm2 = new Promise((resolve, rejects) => {
+                    let x = db.Follow.count({where: {userIdFollowed: id}})
+                    resolve(x)
+                })
+                const x = await Promise.all([prm0, prm1, prm2])
+                let [countRecipe, countFollowing, countFollowed] = [...x]
+
+                let newData = {user, countRecipe, countFollowing, countFollowed}
                 res.status(200).json({
                     success: true, 
                     message: "Successfully get data", 
