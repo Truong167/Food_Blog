@@ -366,7 +366,6 @@ class recipeController {
             let recipe = await db.Recipe.findAll({
                 where: {
                     date: {
-                        // [Op.between]: ['2023-02-24', '2022-01-01']
                         [Op.lt]: today,
                         [Op.gt]: newDate
                     }
@@ -374,18 +373,21 @@ class recipeController {
                 },
                 include: [
                     {   
-                        require: true,
-                        duplicating: false,
+                        // require: true,
+                        // duplicating: false,
                         model: db.Comment,
                         attributes: []
                     },
+                    {
+                        model: db.User,
+                        attributes: ["fullName", "avatar", "userId"]
+                    },
                 ],
-                attributes: {
-                    include: [
-                        [sequelize.fn('COUNT', sequelize.col('Comments.recipeId')), 'count']
-                    ],
-                },
-                group: ['Recipe.recipeId'],
+                attributes: [
+                    "recipeId", "recipeName", "date", "numberOfLikes", "image", 
+                    [sequelize.fn('COUNT', sequelize.col('Comments.recipeId')), 'count']
+                ],
+                group: ['Recipe.recipeId', "User.fullName", "User.avatar", "User.userId"],
                 order: [
                     ['numberOfLikes', 'DESC'],
                     ['count', 'DESC'],
@@ -454,6 +456,45 @@ class recipeController {
                 })
                 return
             }
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: error,
+                data: ""
+            })
+        }
+    }
+
+    handleGetRecipeByName = async (req, res) => {
+        try {
+            const {slug} = req.params
+            const recipe = await db.Recipe.findAll({
+                where: {
+                    recipeName: {
+                        [Op.iLike]: `%${slug}%`
+                    }
+                },
+                include: {
+                    model: db.User,
+                    attributes: ["fullName", "avatar", "userId"]
+                },
+                    attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image", "description"],
+                    order: [["date", 'DESC']]
+            })
+            if(recipe && recipe.length > 0){
+                res.status(200).json({
+                    success: true,
+                    message: "Successfully get data",
+                    data: recipe
+                })
+                return
+            }
+
+            res.status(432).json({
+                success: false,
+                message: "Recipe not found",
+                data: ""
+            })
         } catch (error) {
             res.status(500).json({
                 success: false,

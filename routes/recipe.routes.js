@@ -12,6 +12,7 @@ router.get('/search', recipeController.handleSearchRecipe)
 router.get('/getRecipeByIngredient/:slug', recipeController.getRecipeByIngredient)
 router.get('/getPopularRecipe', recipeController.getPopularRecipe)
 router.get('/getRecipeFromFollowers', recipeController.getRecipeFromFollowers)
+router.get('/getRecipeByName/:slug', recipeController.handleGetRecipeByName)
 
 
 
