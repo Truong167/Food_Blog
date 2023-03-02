@@ -244,16 +244,14 @@ class recipeController {
         try {
 
             // http://localhost:8080/api/v1/recipe/search?q=mì
-            const { q } = req.query
+            const { q, type } = req.query
             let recipe = await db.Recipe.findAll({
                 where: {
                     recipeName: {
                         [Op.iLike]: `%${q}%`
                     }
                 },
-                attributes: {
-                    exclude: ['image']
-                }
+                attributes: ["recipeName"]
             })
 
             if(recipe && recipe.length > 0){
@@ -417,8 +415,8 @@ class recipeController {
 
     getRecipeFromFollowers = async (req, res) => {
         try {
-            const userId = req.userId
-            // const userId = 3
+            // const userId = req.userId
+            const userId = 3
             let followers = await db.Follow.findAll({
                 where: {
                     userIdFollow: userId,
@@ -427,15 +425,14 @@ class recipeController {
                 attributes: ["userIdFollowed"]
             })
             if(followers && followers.length == 0) {
-                res.status(200).json({
+                res.status(436).json({
                     success: false,
-                    message: "User do not follow anyone",
+                    message: "User do not follow anyone or do not have update from anyone",
                     data: "",
                 })
                 return
             }
-            let newFollowerData = []
-            followers.map(item => newFollowerData.push(item.dataValues.userIdFollowed))
+            let newFollowerData = followers.map(item => item.dataValues.userIdFollowed)
             let recipe = await db.Recipe.findAll({
                 where: {
                     userId: {
@@ -460,7 +457,7 @@ class recipeController {
         } catch (error) {
             res.status(500).json({
                 success: false,
-                message: error.message,
+                message: error,
                 data: ""
             })
         }

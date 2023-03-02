@@ -22,7 +22,7 @@ class commentController {
                     attributes: {exclude: ["createdAt", "updatedAt"]}
                 })
                 let commentCount = await db.Comment.count({where: {recipeId: recipeId}})
-                let newData = [{comment, commentCount: commentCount}]
+                let newData = {comment, commentCount: commentCount}
                 res.status(200).json({
                     success: true, 
                     message: 'Successfully get data',
@@ -51,6 +51,15 @@ class commentController {
             let userId = req.userId
             let { comment } = req.body
             let recipe = await db.Recipe.findByPk(recipeId)
+            let checkComment = await db.Comment.findOne({where: {userId: userId, recipeId: recipeId}})
+            if(checkComment){
+                res.status(437).json({
+                    success: true, 
+                    message: 'Users are only allowed to comment once per recipe',
+                    data: ""
+                })
+                return
+            }
             if(recipe) {
                 let commentData = await db.Comment.create({
                     userId: userId,
@@ -73,7 +82,7 @@ class commentController {
         } catch (error) {
             res.status(500).json({
                 success: false, 
-                message: error.message,
+                message: error,
                 data: ""
             })
         }

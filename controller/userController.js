@@ -53,7 +53,7 @@ class userController {
             })
             if(user) {
                 let countRecipe = await db.Recipe.count({where: {userId: id}})
-                let newData = [{user, countRecipe: countRecipe}]
+                let newData = {user, countRecipe: countRecipe}
                 res.status(200).json({
                     success: true, 
                     message: "Successfully get data", 
