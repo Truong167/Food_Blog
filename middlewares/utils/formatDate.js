@@ -1,6 +1,7 @@
+const moment = require('moment')
 
 const formatDate = function(date) {
-    return require('moment').utc(date).local().format('DD-MM-YYYY hh:mm:ss A');
+    return moment(date).format('DD-MM-YYYY HH:mm:ss');
 }
 
 
