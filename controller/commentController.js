@@ -8,7 +8,8 @@ class commentController {
 
     getCommentOfRecipe = async (req, res) => {
         try {
-            let {recipeId} = req.params
+            const userId = req.userId
+            const {recipeId} = req.params
             let recipe = await db.Recipe.findByPk(recipeId)
             if(recipe) {
                 let comment = await db.Comment.findAll({
@@ -21,14 +22,22 @@ class commentController {
                     },
                     attributes: {exclude: ["createdAt", "updatedAt"]}
                 })
-                let commentCount = await db.Comment.count({where: {recipeId: recipeId}})
-                let newData = {comment, commentCount: commentCount}
-                res.status(200).json({
-                    success: true, 
-                    message: 'Successfully get data',
-                    data: newData
-                })
-                return
+                if(comment && comment.length > 0) {
+                    let commentCount = await db.Comment.count({where: {recipeId: recipeId}})
+                    let myComment = await db.Comment.findOne({where: {userId: userId, recipeId: recipeId}})
+                    let newData = {comment, commentCount: commentCount, myComment}
+                    return res.status(200).json({
+                        success: true, 
+                        message: 'Successfully get data',
+                        data: newData
+                    })
+                } else {
+                    return res.status(438).json({
+                        success: false, 
+                        message: 'Do not have comment with this recipe',
+                        data: ""
+                    })
+                }
             }
 
             res.status(432).json({
