@@ -1,5 +1,5 @@
 
-const db = require('../models/index')
+const db = require('../models')
 const {sequelize} = require('../models/index')
 const Sequelize = require('sequelize')
 const { Op } = Sequelize
@@ -210,7 +210,7 @@ class recipeController {
                         model: db.Ingredient,
                         attributes: []
                     },
-                    attributes: ["amount", [Sequelize.col('name'), "ingredientName"]]
+                    attributes: ["ingredientId", "amount", [Sequelize.col('name'), "ingredientName"]]
                 })
                 resolve(x)
             })
