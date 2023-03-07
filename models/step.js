@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     description: DataTypes.STRING,
     image: DataTypes.STRING,
+    stepIndex: DataTypes.INTEGER,
     recipeId: DataTypes.INTEGER
   }, {
     sequelize,

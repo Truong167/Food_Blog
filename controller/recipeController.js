@@ -3,6 +3,8 @@ const db = require('../models')
 const {sequelize} = require('../models/index')
 const Sequelize = require('sequelize')
 const { Op } = Sequelize
+let multerConfig = require("../middlewares/utils/multerConfig")
+
 
 class recipeController {
     getRecipe = async (req, res) => {
@@ -39,52 +41,56 @@ class recipeController {
     }
 
     handleCreateRecipe = async (req, res) => {
-        let { name, amount, status, prepareTime, cookTime, ingredient, step } = req.body
-        if(!name || !amount || !prepareTime || !cookTime || !status) {
-            res.status(418).json({
-                status: false,
-                message: 'Please provide all required fields',
-                data: ""
-            })
-            return
-        }
+        // let uploadFile = multerConfig('public/image/step', "step")
+        // uploadFile( req, res, async (error) => {
 
-        try {
-            let  userId = req.userId
-            const result = await sequelize.transaction(async t => {
-                let recipe = await db.Recipe.create({
-                    recipeName: name,
-                    date: Date.now(),
-                    amount: amount,
-                    status: status,
-                    preparationTime: prepareTime,
-                    cookingTime: cookTime,
-                    userId: userId
-                }, { transaction: t })
-                ingredient = ingredient.map(item => {
-                    item.recipeId = recipe.recipeId
-                    return item
+        // })
+        let { name, amount, status, prepareTime, cookTime, ingredient, step } = req.body
+            if(!name || !amount || !prepareTime || !cookTime || !status) {
+                res.status(418).json({
+                    status: false,
+                    message: 'Please provide all required fields',
+                    data: ""
                 })
-                step = step.map(item => {
-                    item.recipeId = recipe.recipeId
-                    return item
+                return
+            }
+            try {
+                let  userId = 3
+                const result = await sequelize.transaction(async t => {
+                    let recipe = await db.Recipe.create({
+                        recipeName: name,
+                        date: Date.now(),
+                        amount: amount,
+                        status: status,
+                        preparationTime: prepareTime,
+                        cookingTime: cookTime,
+                        userId: userId
+                    }, { transaction: t })
+                    ingredient = ingredient.map(item => {
+                        item.recipeId = recipe.recipeId
+                        return item
+                    })
+                    step = step.map(item => {
+                        item.recipeId = recipe.recipeId
+                        item.image = req.file ? `/user/${req.file.filename}` : null
+                        return item
+                    })
+                    let ingre = await db.DetailIngredient.bulkCreate(ingredient, { transaction: t })
+                    let stepRes = await db.Step.bulkCreate(step, { transaction: t })
+                    return {recipe, ingre, stepRes}
                 })
-                let ingre = await db.DetailIngredient.bulkCreate(ingredient, { transaction: t })
-                let stepRes = await db.Step.bulkCreate(step, { transaction: t })
-                return {recipe, ingre, stepRes}
-            })
-            res.status(200).json({
-                success: true, 
-                message: 'Successfully added',
-                data: result
-            })
-        } catch (error) {
-            res.status(500).json({
-                success: false, 
-                message: error, 
-                data: ""
-            })
-        }
+                res.status(200).json({
+                    success: true, 
+                    message: 'Successfully added',
+                    data: result
+                })
+            } catch (error) {
+                res.status(500).json({
+                    success: false, 
+                    message: error, 
+                    data: ""
+                })
+            }
     }
 
     handleUpdateRecpipe = async (req, res) => {
@@ -417,8 +423,8 @@ class recipeController {
 
     getRecipeFromFollowers = async (req, res) => {
         try {
-            // const userId = req.userId
-            const userId = 3
+            const userId = req.userId
+            // const userId = 3
             let followers = await db.Follow.findAll({
                 where: {
                     userIdFollow: userId,

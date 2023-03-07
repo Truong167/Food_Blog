@@ -15,7 +15,7 @@ function multerConfig(path, name){
           }
        
           // đổi file name
-          let filename = `${name}-${file.originalname}`;
+          let filename = `${name}-${Date.now()}-${file.originalname}`;
           callback(null, filename);
         }
       });
