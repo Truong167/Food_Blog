@@ -8,6 +8,8 @@ const userController = require('../controller/userController')
 
 router.get('/getAllUser', userController.getAllUser)
 router.get('/getUser/:id', userController.getUserById)
+router.get('/getUserFollowing/:userId', userController.getUserFollowing)
+router.get('/getUserFollow/:userId', userController.getUserFollow)
 
 router.put('/update', userController.handleUpdateUser)
 

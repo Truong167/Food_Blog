@@ -4,7 +4,8 @@ let multerConfig = require("../middlewares/utils/multerConfig");
 const {
     checkEmailExists,
 } = require('../middlewares/validator')
-const {sequelize} = require('../models/index')
+const {sequelize} = require('../models/index');
+const { Op } = require('sequelize');
 require('dotenv').config()
 
 
@@ -150,6 +151,97 @@ class userController {
         })
     }
 
+    getUserFollowing = async (req, res) => {
+        const { userId } = req.params
+        try {
+            let userFollow = await db.Follow.findAll({
+                where: {
+                    userIdFollow: userId
+                },
+                attributes: ["userIdFollowed"],
+            })
+            let count = await db.Follow.count({
+                where: {
+                    userIdFollow: userId
+                }
+            })
+            if(userFollow && userFollow.length > 0){
+                let newFollowerData = userFollow.map(item => item.dataValues.userIdFollowed)
+                let users = await db.User.findAll({
+                    where: {
+                        userId: {
+                            [Op.or]: [newFollowerData]
+                        }
+                    },
+                    attributes: ["userId", "fullName", "avatar"]
+                })
+                const newData = {users, count}
+                res.status(200).json({
+                    success: true,
+                    message: "Successfully get data",
+                    data: newData,
+                })
+                return
+            }
+            res.status(436).json({
+                success: false,
+                message: "User do not follow anyone",
+                data: "",
+            })
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: error,
+                data: ""
+            })
+        }
+    } 
+
+    getUserFollow = async (req, res) => {
+        const { userId } = req.params
+        try {
+            let userFollow = await db.Follow.findAll({
+                where: {
+                    userIdFollowed: userId
+                },
+                attributes: ["userIdFollow"],
+            })
+            let count = await db.Follow.count({
+                where: {
+                    userIdFollowed: userId
+                }
+            })
+            if(userFollow && userFollow.length > 0){
+                let newFollowerData = userFollow.map(item => item.dataValues.userIdFollow)
+                let users = await db.User.findAll({
+                    where: {
+                        userId: {
+                            [Op.or]: [newFollowerData]
+                        }
+                    },
+                    attributes: ["userId", "fullName", "avatar"]
+                })
+                const newData = {users, count}
+                res.status(200).json({
+                    success: true,
+                    message: "Successfully get data",
+                    data: newData
+                })
+                return
+            }
+            res.status(436).json({
+                success: false,
+                message: "User do not follow anyone",
+                data: "",
+            })
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: error,
+                data: ""
+            })
+        }
+    } 
 }
 
 module.exports = new userController

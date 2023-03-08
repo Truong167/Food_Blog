@@ -17,6 +17,13 @@ class favoriteController {
                     recipeId: recipeId,
                     date: Date.now()
                 })
+                let count = await db.Favorite.count({
+                    where: {
+                        recipeId: recipeId
+                    }
+                })
+                recipe.numberOfLikes = count
+                await recipe.save()
                 res.status(200).json({
                     success: true, 
                     message: 'Successfully',
@@ -32,7 +39,7 @@ class favoriteController {
         } catch (error) {
             res.status(500).json({
                 success: false, 
-                message: error.message,
+                message: error,
                 data: ""
             })
         }
@@ -43,13 +50,21 @@ class favoriteController {
             let { recipeId } = req.params
             let userId = req.userId
             let favorite = await db.Favorite.findOne({where: {userId: userId, recipeId: recipeId}})
+            let recipe = await db.Recipe.findByPk(recipeId)
             if(favorite) {
-                let favoriteData = await favorite.destroy()
+                await favorite.destroy()
                 res.status(200).json({
                     success: true, 
                     message: 'Successfully',
-                    data: favoriteData,
+                    data: "",
                 })
+                let count = await db.Favorite.count({
+                    where: {
+                        recipeId: recipeId
+                    }
+                })
+                recipe.numberOfLikes = count
+                await recipe.save()
                 return
             }
             res.status(432).json({

@@ -366,7 +366,7 @@ class recipeController {
 
     getPopularRecipe = async (req, res) => {
         let today = new Date()
-        var newDate = new Date(today.getTime() - (60*60*24*7*1000))
+        var newDate = new Date(today.getTime() - (60*60*24*7*1000)) // lấy 7 ngày trước
         console.log(today)
         try {
             let recipe = await db.Recipe.findAll({
@@ -379,8 +379,6 @@ class recipeController {
                 },
                 include: [
                     {   
-                        // require: true,
-                        // duplicating: false,
                         model: db.Comment,
                         attributes: []
                     },
@@ -428,7 +426,7 @@ class recipeController {
             let followers = await db.Follow.findAll({
                 where: {
                     userIdFollow: userId,
-                    isSeen: false
+                    isSeen: false,
                 },
                 attributes: ["userIdFollowed"]
             })

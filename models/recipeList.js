@@ -26,10 +26,11 @@ module.exports = (sequelize, DataTypes) => {
     date: {
       type:DataTypes.DATE,
       get: function() {
-        return formatDate(this.getDataValue(date))
+        return formatDate(this.getDataValue('date'))
       }
     },
-    userId: DataTypes.INTEGER
+    userId: DataTypes.INTEGER,
+    image: DataTypes.STRING
   }, {
     sequelize,
     freezeTableName: true,

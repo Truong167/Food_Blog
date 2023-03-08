@@ -1,38 +1,83 @@
 
 const db = require('../models/index')
+const multerConfig = require('../middlewares/utils/multerConfig')
 
 
 class recipeListController {
     
-    handleCreateRecipeList = async (req, res) => {
-        let { name } = req.body
-        if(!name) {
-            res.status(418).json({
+    getRecipeList = async (req, res) => {
+        try {
+            const userId = req.userId
+            const recipeList = await db.RecipeList.findAll({
+                where: {
+                    userId: userId
+                },
+                attributes: ["recipeListId", "name", "image"]
+            })
+            if(recipeList && recipeList.length > 0) {
+                res.status(200).json({
+                    success: true,
+                    message: "Successfully get data",
+                    data: recipeList
+                })
+                return
+            }
+            res.status(439).json({
                 success: false,
-                message: 'Missing request data',
+                message: "User do not have any recipe list",
                 data: ""
             })
-            return
-        }
-        try {
-            let userId = req.userId
-            await db.RecipeList.create({
-                name: name,
-                date: Date.now(),
-                userId: userId
-            })
-            res.status(200).json({
-                success: true,
-                message: `Recipe list saved successfully.`,
-                data: recipeList,
-              })
         } catch (error) {
             res.status(500).json({
-                success: false, 
+                success: false,
                 message: error.message,
                 data: ""
             })
         }
+    }
+
+    handleCreateRecipeList = async (req, res) => {
+        let uploadFile = multerConfig('public/image/recipeList', "recipeList") 
+        uploadFile(req, res, async (error) => {
+            let { name } = req.body
+            if(error) {
+                res.status(418).json({
+                    success: false,
+                    message: error,
+                    data: ""
+                })
+                return
+            }
+            if(!name) {
+                res.status(418).json({
+                    success: false,
+                    message: 'Missing request data',
+                    data: ""
+                })
+                return
+            }
+            try {
+                let userId = req.userId
+                const recipeList = await db.RecipeList.create({
+                    name: name,
+                    date: Date.now(),
+                    userId: userId,
+                    image: req.file ? `/recipeList/${req.file.filename}` : null
+                })
+                res.status(200).json({
+                    success: true,
+                    message: `Recipe list saved successfully.`,
+                    data: recipeList,
+                  })
+            } catch (error) {
+                res.status(500).json({
+                    success: false, 
+                    message: error,
+                    data: ""
+                })
+            }
+
+        })
     }
 
     handleUpdateRecipeList = async (req, res) => {
