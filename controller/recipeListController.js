@@ -41,7 +41,7 @@ class recipeListController {
         uploadFile(req, res, async (error) => {
             let { name } = req.body
             if(error) {
-                res.status(418).json({
+                res.status(440).json({
                     success: false,
                     message: error,
                     data: ""
@@ -171,7 +171,20 @@ class recipeListController {
         try {
             let { recipeListId, recipeId } = req.params
             let recipe = await db.Recipe.findByPk(recipeId)
-            if(recipe) {
+            let dtRecipe = await db.DetailList.findOne({where: {recipeListId: recipeListId, recipeId: recipeId}})
+            if(!recipe) {
+                res.status(432).json({
+                    success: true,
+                    message: 'Recipe not found',
+                    data: ""
+                })
+            } else if(dtRecipe) {
+                res.status(432).json({
+                    success: true,
+                    message: 'Recipe is exist in recipe list',
+                    data: ""
+                })
+            } else {
                 let detailList = await db.DetailList.create({
                     recipeListId: recipeListId,
                     recipeId: recipeId,
@@ -182,18 +195,12 @@ class recipeListController {
                     message: 'Recipe created successfully',
                     data: detailList
                 })
-                return
             }
-            res.status(432).json({
-                success: true,
-                message: 'Recipe not found',
-                data: ""
-            })
 
         } catch (error) {
             res.status(500).json({
                 success: false, 
-                message: error.message,
+                message: error,
                 data: ""
             })
         }
@@ -208,7 +215,7 @@ class recipeListController {
                 res.status(200).json({
                     success: true,
                     message: 'Deleted successfully',
-                    data: detailList
+                    data: ""
                 })
                 return
             }

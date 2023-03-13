@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
     date: {
       type: DataTypes.DATE,
       get: function() {
-        return formatDate(this.getDataValue(date))
+        return formatDate(this.getDataValue("date"))
       }
     }
   }, {

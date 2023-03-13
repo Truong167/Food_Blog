@@ -16,9 +16,8 @@ router.get('/getRecipeByName/:slug', recipeController.handleGetRecipeByName)
 router.get('/getRecipeByUserId/:userId', recipeController.getRecipeByUserId)
 
 
-
 router.post('/createRecipe', recipeController.handleCreateRecipe)
-router.put('/updateRecipe/:id', recipeController.handleUpdateRecpipe)
+router.post('/updateRecipe/:id', recipeController.handleUpdateRecpipe)
 router.put('/updatePrivacyRecipe/:id', recipeController.updatePrivacyOfRecipe)
 router.delete('/deleteRecipe/:id', recipeController.handleDeleteRecipe)
 

@@ -55,7 +55,7 @@ class recipeController {
                 return
             }
             try {
-                let  userId = 3
+                let  userId = req.userId
                 const result = await sequelize.transaction(async t => {
                     let recipe = await db.Recipe.create({
                         recipeName: name,
@@ -95,18 +95,26 @@ class recipeController {
 
     handleUpdateRecpipe = async (req, res) => {
         try {
-            let { name, amount, prepareTime, cookTime } = req.body
+            let { name, amount, prepareTime, cookTime, step } = req.body
             let recipeId  = req.params.id
 
             let recipe = await db.Recipe.findByPk(recipeId)
 
             if(recipe) {
-                recipe.recipeName = name
-                recipe.amount = amount
-                recipe.preparationTime = prepareTime
-                recipe.cookingTime = cookTime
+                step = step.map(item => {
+                    item.recipeId = recipe.recipeId
+                    return item
+                })
+                let stepRes = await db.Step.bulkCreate(step, {
+                    updateOnDuplicate: ["stepIndex", "description"],
+                })
+                console.log(stepRes)
+                // recipe.recipeName = name
+                // recipe.amount = amount
+                // recipe.preparationTime = prepareTime
+                // recipe.cookingTime = cookTime
 
-                await recipe.save()
+                // await recipe.save()
 
                 res.status(200).json({
                     success: true, 
@@ -124,7 +132,7 @@ class recipeController {
         } catch (error) {
             res.status(500).json({
                 success: false, 
-                message: error,
+                message: error.message,
                 data: ""
             })
         }
@@ -250,7 +258,7 @@ class recipeController {
         try {
 
             // http://localhost:8080/api/v1/recipe/search?q=mì
-            const { q, type } = req.query
+            const {q} = req.query
             let recipe = await db.Recipe.findAll({
                 where: {
                     recipeName: {
@@ -286,12 +294,15 @@ class recipeController {
     updatePrivacyOfRecipe = async (req, res) => {
         try {
             let { id } = req.params
-            let { status } = req.body
 
             let recipe = await db.Recipe.findByPk(id)
 
             if(recipe) {
-                recipe.status = status
+                if(recipe.status == "CK"){
+                    recipe.status = "RT"
+                } else {
+                    recipe.status = "CK"
+                }
 
                 let recipeData = await recipe.save()
                 res.status(200).json({
@@ -518,14 +529,17 @@ class recipeController {
                 order: [["date", "DESC"]],
                 attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image", "status"]
             })
+            const user = await db.User.findByPk(userId)
             if(recipe && recipe.length > 0) {
+                const newData = {user, recipe}
                 res.status(200).json({
                     success: true,
                     message: "Successfully get data",
-                    data: recipe
+                    data: newData
                 })
                 return
             }
+
             res.status(432).json({
                 success: true,
                 message: "Recipe not found",

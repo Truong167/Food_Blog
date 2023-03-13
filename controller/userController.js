@@ -183,7 +183,7 @@ class userController {
                 })
                 return
             }
-            res.status(436).json({
+            res.status(441).json({
                 success: false,
                 message: "User do not follow anyone",
                 data: "",
@@ -229,9 +229,9 @@ class userController {
                 })
                 return
             }
-            res.status(436).json({
+            res.status(442).json({
                 success: false,
-                message: "User do not follow anyone",
+                message: "No one is following this user",
                 data: "",
             })
         } catch (error) {
