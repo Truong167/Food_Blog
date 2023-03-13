@@ -9,11 +9,13 @@ const recipeController = require('../controller/recipeController')
 router.get('/getAllRecipe', recipeController.getRecipe)
 router.get('/getRecipe/:id', recipeController.getDetailRecipe)
 router.get('/search', recipeController.handleSearchRecipe)
+router.get('/searchRecipe', recipeController.searchRecipe)
 router.get('/getRecipeByIngredient/:slug', recipeController.getRecipeByIngredient)
 router.get('/getPopularRecipe', recipeController.getPopularRecipe)
 router.get('/getRecipeFromFollowers', recipeController.getRecipeFromFollowers)
 router.get('/getRecipeByName/:slug', recipeController.handleGetRecipeByName)
 router.get('/getRecipeByUserId/:userId', recipeController.getRecipeByUserId)
+
 
 
 router.post('/createRecipe', recipeController.handleCreateRecipe)

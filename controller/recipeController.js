@@ -553,6 +553,47 @@ class recipeController {
             })
         }
     }
+
+    searchRecipe = async (req, res) => {
+        try {
+
+            // http://localhost:8080/api/v1/recipe/search?q=mì
+            const {q} = req.query
+            let recipe = await db.Recipe.findAll({
+                include: {
+                    model: db.User,
+                    attributes: ["fullName", "avatar", "userId"]
+                },
+                attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image"],
+                where: {
+                    recipeName: {
+                        [Op.iLike]: `%${q}%`
+                    }
+                },
+            })
+
+            if(recipe && recipe.length > 0){
+                res.status(200).json({
+                    success: true,
+                    message: 'Successfully search',
+                    data: recipe
+                })
+                return
+            }
+
+            res.status(432).json({
+                success: false, 
+                message: 'Recipe not found',
+                data: ""
+            })
+        } catch (error) {
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: ""
+            })
+        }
+    }
 }
 
 
