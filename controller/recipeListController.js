@@ -234,6 +234,47 @@ class recipeListController {
         }
     }
 
+
+    getRecipe = async (req, res) => {
+        try {
+            let {recipeListId} = req.params
+            let recipe = await db.DetailList.findAll({
+                where: {
+                    recipeListId: recipeListId
+                },
+                include: [
+                    {
+                        model: db.Recipe,
+                        include: {model: db.User},
+                        required: true
+                    }
+                ],
+            })
+
+            if(recipe && recipe.length > 0){
+                console.log(recipe.dataValues)
+                recipe.isLike = true
+                res.status(200).json({
+                    success: true,
+                    message: 'Successfully get data',
+                    data: recipe
+                })
+                return
+            }
+            res.status(432).json({
+                success: true, 
+                message: 'Recipe list not found',
+                data: ""
+            })
+        } catch (error) {
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: ""
+            })
+        }
+    }
+
 }
 
 module.exports = new recipeListController

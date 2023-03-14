@@ -66,7 +66,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     image: DataTypes.STRING,
     description: DataTypes.STRING,
-    userId: DataTypes.INTEGER
+    userId: DataTypes.INTEGER,
   }, {
     sequelize,
     freezeTableName: true,

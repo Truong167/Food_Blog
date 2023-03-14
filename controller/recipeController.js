@@ -16,7 +16,7 @@ class recipeController {
                     model: db.User,
                     attributes: ["fullName", "avatar", "userId"]
                 },
-                attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image"],
+                attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image", "status"],
                 order: [["date", 'DESC']]
             })
             if(data && data.length > 0) {
@@ -197,9 +197,9 @@ class recipeController {
         try {
             // Get id in URL
             // http://localhost:8080/api/v1/recipe/getRecipe/4   id = 4
+            let userId = req.userId
             let recipeId  = req.params.id
-            const prm0 = new Promise((resolve, rejects) => {
-                let x = db.Recipe.findByPk(recipeId, {
+            let recipe = await db.Recipe.findByPk(recipeId, {
                     include: [
                     {
                         model: db.Step,
@@ -207,35 +207,54 @@ class recipeController {
                     },
                     {
                         model: db.User,
-                        attributes: ["userId", "fullName", "avatar"]
+                        attributes: [
+                            "userId", "fullName", "avatar",
+                            [sequelize.literal(` (SELECT CASE WHEN EXISTS 
+                                (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${userId}) 
+                                then True else False end isFollow) `), "isFollow"]
+                        ]
+                    },
+                    {
+                        model: db.DetailList,
+                        include: {
+                            model: db.RecipeList,
+                            attributes: ["name"]
+                        },
+                        attributes: ["recipeListId"]
+                    }, 
+                    {
+                        model: db.DetailIngredient,
+                        include: {
+                            model: db.Ingredient,
+                            attributes: ["name"]
+                        },
+                        attributes: ["ingredientId", "amount"]
                     }
                     ],
-                    attributes: {exclude: ["createdAt", "updatedAt"]}
+                    attributes: {
+                        exclude: ["createdAt", "updatedAt"], 
+                        include: [
+                            [sequelize.literal(`(SELECT CASE WHEN EXISTS 
+                            (SELECT * FROM "Favorite" WHERE "recipeId" = "Recipe"."recipeId" and "userId" = ${userId}) 
+                            THEN True ELSE False end isFavorite) `), "isFavorite"], 
+                    ]}
                 })
-                resolve(x)
+        
+            recipe.dataValues.DetailLists.map(item => {
+                item.dataValues.name = item.dataValues.RecipeList.dataValues.name
+                delete item.dataValues['RecipeList']
+                return item
             })
-            const prm1 = new Promise((resolve, rejects) => {
-                let x =  db.DetailIngredient.findAll({
-                    where: {
-                        recipeId: recipeId
-                    },
-                    include: 
-                    {
-                        model: db.Ingredient,
-                        attributes: []
-                    },
-                    attributes: ["ingredientId", "amount", [Sequelize.col('name'), "ingredientName"]]
-                })
-                resolve(x)
+            recipe.dataValues.DetailIngredients.map(item => {
+                item.dataValues.name = item.dataValues.Ingredient.dataValues.name
+                delete item.dataValues['Ingredient']
+                return item
             })
-            let x = await Promise.all([prm0, prm1])
-            let [recipe, ingredient] = [...x]
-            let newData = {recipe, ingredient}
             if(recipe) {
                 res.json({
                     success: true,
                     message: "Successfully get data",
-                    data: newData,
+                    data: recipe,
                 })
                 return
             }
@@ -350,7 +369,7 @@ class recipeController {
                         attributes: ["fullName", "avatar", "userId"]
                     }
                 ],
-                attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image"]
+                attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image", "status"]
             })
             if(recipe && recipe.length > 0) {
                 res.status(200).json({
@@ -399,7 +418,7 @@ class recipeController {
                     },
                 ],
                 attributes: [
-                    "recipeId", "recipeName", "date", "numberOfLikes", "image", 
+                    "recipeId", "recipeName", "date", "numberOfLikes", "image", "status",
                     [sequelize.fn('COUNT', sequelize.col('Comments.recipeId')), 'count']
                 ],
                 group: ['Recipe.recipeId', "User.fullName", "User.avatar", "User.userId"],
@@ -433,7 +452,6 @@ class recipeController {
     getRecipeFromFollowers = async (req, res) => {
         try {
             const userId = req.userId
-            // const userId = 3
             let followers = await db.Follow.findAll({
                 where: {
                     userIdFollow: userId,
@@ -460,7 +478,7 @@ class recipeController {
                     model: db.User,
                     attributes: ["fullName", "avatar", "userId"]
                 },
-                    attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image"],
+                    attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image", "status"],
                     order: [["date", 'DESC']]
             })
             if(recipe && recipe.length > 0 ){
@@ -493,7 +511,7 @@ class recipeController {
                     model: db.User,
                     attributes: ["fullName", "avatar", "userId"]
                 },
-                    attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image", "description"],
+                    attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image", "description", "status"],
                     order: [["date", 'DESC']]
             })
             if(recipe && recipe.length > 0){
@@ -564,7 +582,7 @@ class recipeController {
                     model: db.User,
                     attributes: ["fullName", "avatar", "userId"]
                 },
-                attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image"],
+                attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image", "status"],
                 where: {
                     recipeName: {
                         [Op.iLike]: `%${q}%`
