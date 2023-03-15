@@ -33,8 +33,27 @@ class userController {
         try {
             let { id } = req.params
             let userId = req.userId
-            let checkUser = await db.User.findByPk(id)
-            if(checkUser) {
+            let user = await db.User.findByPk(id, {
+                include: [
+                    {
+                        model: db.Recipe,
+                        attributes: [
+                            "recipeId", "recipeName", "date", "numberOfLikes", "image", "status",
+                            [sequelize.literal(`(SELECT CASE WHEN EXISTS 
+                                (SELECT * FROM "Favorite" WHERE "recipeId" = "Recipes"."recipeId" and "userId" = ${userId}) 
+                                THEN True ELSE False end isFavorite) `), "isFavorite"]
+                        ],
+                        order: [['date', 'DESC']],
+                    },
+                ],
+                attributes: {
+                    exclude: ["dateUpdatedRecipe", "createdAt", "updatedAt"], 
+                    include: [[sequelize.literal(` (SELECT CASE WHEN EXISTS 
+                        (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${userId}) 
+                        then True else False end isFollow) `), "isFollow"]]
+                },
+            })
+            if(user) {
                 const prm0 = new Promise((resolve, rejects) => {
                     let x = db.Recipe.count({where: {userId: id}})
                     resolve(x)
@@ -49,30 +68,6 @@ class userController {
                 })
                 const x = await Promise.all([prm0, prm1, prm2])
                 let [countRecipe, countFollowing, countFollowed] = [...x]
-
-                let user = await sequelize.query(`SELECT "User"."userId", "User"."fullName", "User"."dateOfBirth", "User"."address", 
-                                                "User"."email", "User"."introduce", "User"."avatar", (SELECT CASE WHEN EXISTS 
-                                                    (Select * from "Follow" where "userIdFollowed" = ${id} and "userIdFollow" = ${userId}) 
-                                                    then True else False end isFollow) 
-                                                    as "isFollow"
-                                                FROM "User"
-                                                WHERE "User"."userId" = ${id};`, {nest: true, plain: false, raw: true})
-                let recipe = await sequelize.query(`SELECT "Recipes"."recipeId" AS 
-                                                    "Recipes.recipeId", "Recipes"."recipeName" AS "Recipes.recipeName", "Recipes"."date" 
-                                                    AS "Recipes.date", "Recipes"."numberOfLikes" AS "Recipes.numberOfLikes", "Recipes"."image" 
-                                                    AS "Recipes.image", "Recipes"."status" AS "Recipes.status", (SELECT CASE WHEN EXISTS 
-                                                    (SELECT * FROM "Favorite" WHERE "recipeId" = "Recipes"."recipeId" and "userId" = ${userId}) 
-                                                    THEN True ELSE False end isFavorite) 
-                                                    as "Recipes.isFavorite"
-                                                    FROM "Recipe" AS "Recipes" 
-                                                    WHERE "Recipes"."userId" = ${id};`, {nest: true, plain: false, raw: true})
-                user = user.map(item => {
-                    item.Recipes = recipe.map(recipeItem => {
-                        return recipeItem.Recipes
-                    })
-                    return item
-                })
-                user = user[0]
                 let newData = {user, countRecipe, countFollowing, countFollowed}
                 res.status(200).json({
                     success: true, 
