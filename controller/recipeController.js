@@ -9,17 +9,45 @@ let multerConfig = require("../middlewares/utils/multerConfig")
 class recipeController {
     getRecipe = async (req, res) => {
         try {
-
+            const userId = req.userId
             // Select * from Recipe, User where Recipe.userId = User.userId
             let data = await db.Recipe.findAll({
-                include: {
-                    model: db.User,
-                    attributes: ["fullName", "avatar", "userId"]
-                },
-                attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image", "status"],
+                include: [
+                    {
+                        model: db.User,
+                        attributes: [
+                            "fullName", "avatar", "userId",
+                            [sequelize.literal(` (SELECT CASE WHEN EXISTS 
+                                (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${userId}) 
+                                then True else False end isFollow) `), "isFollow"]
+                        ]
+                    },
+                    {
+                        model: db.DetailList,
+                        include: {
+                            model: db.RecipeList,
+                            attributes: ["name"]
+                        },
+                        attributes: ["recipeListId"]
+                    }, 
+                ]
+                ,
+                attributes: [
+                    "recipeId", "recipeName", "date", "numberOfLikes", "image", "status",
+                    [sequelize.literal(`(SELECT CASE WHEN EXISTS 
+                        (SELECT * FROM "Favorite" WHERE "recipeId" = "Recipe"."recipeId" and "userId" = ${userId}) 
+                        THEN True ELSE False end isFavorite) `), "isFavorite"]
+                ],
                 order: [["date", 'DESC']]
             })
             if(data && data.length > 0) {
+                data.map(item => {
+                    item.dataValues.DetailLists.map(item => {
+                        item.dataValues.name = item.dataValues.RecipeList.dataValues.name
+                        delete item.dataValues['RecipeList']
+                        return item
+                    })
+                })
                 return res.status(200).json({
                     success: true,
                     message: 'Successfully get data',
@@ -349,11 +377,11 @@ class recipeController {
     getRecipeByIngredient = async (req, res) => {
         try {
             let { slug } = req.params
+            let userId = req.userId
             let recipe = await db.Recipe.findAll({
                 include: [ 
                     {
                         required: true,
-                        model: db.User,
                         model: db.DetailIngredient,
                         include: { 
                             model: db.Ingredient,
@@ -366,12 +394,37 @@ class recipeController {
                     },
                     {
                         model: db.User,
-                        attributes: ["fullName", "avatar", "userId"]
-                    }
+                        attributes: [
+                            "fullName", "avatar", "userId",
+                            [sequelize.literal(` (SELECT CASE WHEN EXISTS 
+                                (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${userId}) 
+                                then True else False end isFollow) `), "isFollow"]
+                        ]
+                    },
+                    {
+                        model: db.DetailList,
+                        include: {
+                            model: db.RecipeList,
+                            attributes: ["name"]
+                        },
+                        attributes: ["recipeListId"]
+                    }, 
                 ],
-                attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image", "status"]
+                attributes: [
+                    "recipeId", "recipeName", "date", "numberOfLikes", "image", "status",
+                    [sequelize.literal(`(SELECT CASE WHEN EXISTS 
+                        (SELECT * FROM "Favorite" WHERE "recipeId" = "Recipe"."recipeId" and "userId" = ${userId}) 
+                        THEN True ELSE False end isFavorite) `), "isFavorite"]
+                ]
             })
             if(recipe && recipe.length > 0) {
+                recipe.map(item => {
+                    item.dataValues.DetailLists.map(item => {
+                        item.dataValues.name = item.dataValues.RecipeList.dataValues.name
+                        delete item.dataValues['RecipeList']
+                        return item
+                    })
+                })
                 res.status(200).json({
                     success: true,
                     message: 'Successfully get data',
@@ -395,9 +448,9 @@ class recipeController {
     }
 
     getPopularRecipe = async (req, res) => {
+        let userId = req.userId
         let today = new Date()
         var newDate = new Date(today.getTime() - (60*60*24*7*1000)) // lấy 7 ngày trước
-        console.log(today)
         try {
             let recipe = await db.Recipe.findAll({
                 where: {
@@ -414,14 +467,33 @@ class recipeController {
                     },
                     {
                         model: db.User,
-                        attributes: ["fullName", "avatar", "userId"]
+                        attributes: [
+                            "fullName", "avatar", "userId",
+                            [sequelize.literal(` (SELECT CASE WHEN EXISTS 
+                                (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${userId}) 
+                                then True else False end isFollow) `), "isFollow"]
+                        ]
+                    },
+                    {
+                        model: db.DetailList,
+                        include: {
+                            model: db.RecipeList,
+                            attributes: ["name"]
+                        },
+                        attributes: ["recipeListId"]
                     },
                 ],
                 attributes: [
                     "recipeId", "recipeName", "date", "numberOfLikes", "image", "status",
-                    [sequelize.fn('COUNT', sequelize.col('Comments.recipeId')), 'count']
+                    [sequelize.fn('COUNT', sequelize.col('Comments.recipeId')), 'count'],
+                    [sequelize.literal(`(SELECT CASE WHEN EXISTS 
+                        (SELECT * FROM "Favorite" WHERE "recipeId" = "Recipe"."recipeId" and "userId" = ${userId}) 
+                        THEN True ELSE False end isFavorite) `), "isFavorite"]
                 ],
-                group: ['Recipe.recipeId', "User.fullName", "User.avatar", "User.userId"],
+                group: [
+                    'Recipe.recipeId', "User.fullName", "User.avatar", "User.userId", "DetailLists.recipeId", 
+                    "DetailLists.recipeListId", "DetailLists->RecipeList.recipeListId"
+                ],
                 order: [
                     ['numberOfLikes', 'DESC'],
                     ['count', 'DESC'],
@@ -429,6 +501,13 @@ class recipeController {
                 ]
             })
             if(recipe && recipe.length > 0) {
+                recipe.map(item => {
+                    item.dataValues.DetailLists.map(item => {
+                        item.dataValues.name = item.dataValues.RecipeList.dataValues.name
+                        delete item.dataValues['RecipeList']
+                        return item
+                    })
+                })
                 return res.status(200).json({
                     success: true,
                     message: "Successfully get data",
@@ -474,14 +553,41 @@ class recipeController {
                         [Op.or]: [newFollowerData]
                     }
                 },
-                include: {
-                    model: db.User,
-                    attributes: ["fullName", "avatar", "userId"]
-                },
-                    attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image", "status"],
+                include: [
+                    {
+                        model: db.User,
+                        attributes: [
+                            "fullName", "avatar", "userId",
+                            [sequelize.literal(` (SELECT CASE WHEN EXISTS 
+                                (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${userId}) 
+                                then True else False end isFollow) `), "isFollow"]
+                        ]
+                    },
+                    {
+                        model: db.DetailList,
+                        include: {
+                            model: db.RecipeList,
+                            attributes: ["name"]
+                        },
+                        attributes: ["recipeListId"]
+                    }, 
+                ],
+                    attributes: [
+                        "recipeId", "recipeName", "date", "numberOfLikes", "image", "status",
+                        [sequelize.literal(`(SELECT CASE WHEN EXISTS 
+                            (SELECT * FROM "Favorite" WHERE "recipeId" = "Recipe"."recipeId" and "userId" = ${userId}) 
+                            THEN True ELSE False end isFavorite) `), "isFavorite"]
+                    ],
                     order: [["date", 'DESC']]
             })
             if(recipe && recipe.length > 0 ){
+                recipe.map(item => {
+                    item.dataValues.DetailLists.map(item => {
+                        item.dataValues.name = item.dataValues.RecipeList.dataValues.name
+                        delete item.dataValues['RecipeList']
+                        return item
+                    })
+                })
                 res.status(200).json({
                     success: true,
                     message: "Successfully get data",
@@ -577,12 +683,23 @@ class recipeController {
 
             // http://localhost:8080/api/v1/recipe/search?q=mì
             const {q} = req.query
+            const userId = req.userId
             let recipe = await db.Recipe.findAll({
                 include: {
                     model: db.User,
-                    attributes: ["fullName", "avatar", "userId"]
+                    attributes: [
+                        "fullName", "avatar", "userId",
+                        [sequelize.literal(` (SELECT CASE WHEN EXISTS 
+                            (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${userId}) 
+                            then True else False end isFollow) `), "isFollow"]
+                    ]
                 },
-                attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image", "status"],
+                attributes: [
+                    "recipeId", "recipeName", "date", "numberOfLikes", "image", "status",
+                    [sequelize.literal(`(SELECT CASE WHEN EXISTS 
+                        (SELECT * FROM "Favorite" WHERE "recipeId" = "Recipe"."recipeId" and "userId" = ${userId}) 
+                        THEN True ELSE False end isFavorite) `), "isFavorite"]
+                ],
                 where: {
                     recipeName: {
                         [Op.iLike]: `%${q}%`

@@ -1,4 +1,6 @@
-1. Sửa api: https://food-blog-services.onrender.com/api/v1/recipe/searchRecipe?q=   
+Lưu ý: https://food-blog-services.onrender.com/api/v1/recipe/searchRecipe?q= là API sửa theo ý của Thi còn https://food-blog-services.onrender.com/api/v1/recipe/search?q= là API dành cho mobile nên kh cần quan tâm nha
+
+1. Sửa api: https://food-blog-services.onrender.com/api/v1/recipe/searchRecipe?q=   --------- xong ---------
 
    {
          "date": "13-03-2023 15:51:56",
@@ -13,26 +15,28 @@
          }
        }
 
-2. Thiếu API Danh sách công thức
+2. Thiếu API Danh sách công thức  // trong file API
 
 3. Thêm field cho API 
-https://food-blog-services.onrender.com/api/v1/recipe/searchRecipe?q=
+https://food-blog-services.onrender.com/api/v1/recipe/searchRecipe?q= --------- xong ---------
 
-https://food-blog-services.onrender.com/api/v1/recipe/search?q=
+
+https://food-blog-services.onrender.com/api/v1/recipe/search?q=  --------- mobile ---------
 
 https://food-blog-services.onrender.com/api/v1/recipe/getRecipe/:id --------- xong ---------
 
-https://food-blog-services.onrender.com/api/v1/recipe/getRecipeByIngredient/:slug
+https://food-blog-services.onrender.com/api/v1/recipe/getRecipeByIngredient/:slug  --------- xong ---------
 
-http://localhost:8080/api/v1/recipe/getRecipeFromFollowers
+http://localhost:8080/api/v1/recipe/getRecipeFromFollowers  --------- xong ---------
 
-https://food-blog-services.onrender.com/api/v1/recipe/getAllRecipe
+https://food-blog-services.onrender.com/api/v1/recipe/getAllRecipe  --------- xong ---------
 
-https://food-blog-services.onrender.com/api/v1/recipe/getPopularRecipe
+https://food-blog-services.onrender.com/api/v1/recipe/getPopularRecipe  --------- xong ---------
 
 Thêm response "isFavorite": true - hoặc false => Để cho biết là công thức đó => user có "Like" hay chưa
 
-Thêm response "isPublic": true - hoặc false => Để cho biết là công thức đó có public hay không. dùng "status": CK - RT
+Thêm response "isPublic": true - hoặc false => Để cho biết là công thức đó có public hay không.  
+--------- response có field "status": CK - RT ---------
 
 Thêm response "listRecipe": là 1 array => hiển thị những list recipe có chứa công thức này.
 

@@ -252,7 +252,6 @@ class recipeListController {
             })
 
             if(recipe && recipe.length > 0){
-                console.log(recipe.dataValues)
                 recipe.isLike = true
                 res.status(200).json({
                     success: true,
