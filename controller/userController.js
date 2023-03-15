@@ -158,6 +158,7 @@ class userController {
 
     getUserFollowing = async (req, res) => {
         const { userId } = req.params
+        const userId1 = req.userId
         try {
             let userFollow = await db.Follow.findAll({
                 where: {
@@ -178,7 +179,12 @@ class userController {
                             [Op.or]: [newFollowerData]
                         }
                     },
-                    attributes: ["userId", "fullName", "avatar"]
+                    attributes: [
+                        "userId", "fullName", "avatar",
+                        [sequelize.literal(` (SELECT CASE WHEN EXISTS 
+                            (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${userId1}) 
+                            then True else False end isFollow) `), "isFollow"]
+                    ]
                 })
                 const newData = {users, count}
                 res.status(200).json({
@@ -204,6 +210,7 @@ class userController {
 
     getUserFollow = async (req, res) => {
         const { userId } = req.params
+        const userId1 = req.userId
         try {
             let userFollow = await db.Follow.findAll({
                 where: {
@@ -224,7 +231,12 @@ class userController {
                             [Op.or]: [newFollowerData]
                         }
                     },
-                    attributes: ["userId", "fullName", "avatar"]
+                    attributes: [
+                        "userId", "fullName", "avatar",
+                        [sequelize.literal(` (SELECT CASE WHEN EXISTS 
+                            (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${userId1}) 
+                            then True else False end isFollow) `), "isFollow"]
+                    ]
                 })
                 const newData = {users, count}
                 res.status(200).json({
