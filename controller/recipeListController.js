@@ -80,6 +80,55 @@ class recipeListController {
         })
     }
 
+    handleCreateRecipeList1 = async (req, res) => {
+        let uploadFile = multerConfig.multerConfig1('public/image/recipeList', "recipeList") 
+        uploadFile(req, res, async (error) => {
+            let { name } = req.body
+            if(error) {
+                res.status(440).json({
+                    success: false,
+                    message: error,
+                    data: ""
+                })
+                return
+            }
+            if(!name) {
+                res.status(418).json({
+                    success: false,
+                    message: 'Missing request data',
+                    data: ""
+                })
+                return
+            }
+            try {
+                let userId = req.userId
+                let file = req.files.map(item => {
+                    let arr = []
+                    arr.push(`/recipeList/${item.filename}`)
+                    return arr
+                })
+                const recipeList = await db.RecipeList.create({
+                    name: name,
+                    date: Date.now(),
+                    userId: userId,
+                    image: file.join(',')
+                })
+                res.status(200).json({
+                    success: true,
+                    message: `Recipe list saved successfully.`,
+                    data: recipeList,
+                  })
+            } catch (error) {
+                res.status(500).json({
+                    success: false, 
+                    message: error,
+                    data: ""
+                })
+            }
+
+        })
+    }
+
     handleUpdateRecipeList = async (req, res) => {
         let { name } = req.body
         if(!name) {

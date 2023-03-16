@@ -13,6 +13,7 @@ router.get("/getRecipeList", recipeListController.getRecipeList)
 router.get("/getRecipe/:recipeListId", recipeListController.getRecipe)
 
 router.post('/createRecipeList', recipeListController.handleCreateRecipeList)
+router.post('/createRecipeList1', recipeListController.handleCreateRecipeList1)
 router.post('/createRecipe/:recipeListId/:recipeId', recipeListController.handleCreateRecipe)
 router.put('/updateRecipeList/:id', recipeListController.handleUpdateRecipeList)
 router.delete('/deleteRecipe/:recipeListId/:recipeId', recipeListController.handleDeleteRecipe)
