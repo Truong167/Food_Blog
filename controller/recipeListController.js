@@ -37,7 +37,7 @@ class recipeListController {
     }
 
     handleCreateRecipeList = async (req, res) => {
-        let uploadFile = multerConfig('public/image/recipeList', "recipeList") 
+        let uploadFile = multerConfig.multerConfig('public/image/recipeList', "recipeList") 
         uploadFile(req, res, async (error) => {
             let { name } = req.body
             if(error) {
