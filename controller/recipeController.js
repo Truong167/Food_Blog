@@ -645,7 +645,7 @@ class recipeController {
 
     getRecipeByUserId = async (req, res) => {
         try {
-            const userId = req.params.userId
+            const userId = req.userId
             const recipe = await db.Recipe.findAll({
                 where: {
                     userId: userId
@@ -729,7 +729,61 @@ class recipeController {
             })
         }
     }
+
+    getRecipeFavorite = async (req, res) => {
+        try {
+            const userId = req.userId
+            let recipeFavorite = await db.Favorite.findAll({
+                where: {
+                    userId: userId
+                },
+                attributes: ["recipeId"]
+            })
+            let recipeId = recipeFavorite.map(item => item.dataValues.recipeId)
+            let recipe = await db.Recipe.findAll({
+                where: {
+                    recipeId: {
+                        [Op.or]: [recipeId]
+                    }
+                },
+                include: {
+                    model: db.User,
+                    attributes: [
+                        "userId", "fullName", "avatar",
+                        [sequelize.literal(` (SELECT CASE WHEN EXISTS 
+                            (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${userId}) 
+                            then True else False end isFollow) `), "isFollow"]
+                    ]
+                },
+                attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image", "status"]
+            })
+            if(recipe && recipe.length > 0) {
+
+                res.status(200).json({
+                    success: true,
+                    message: 'Successfully search',
+                    data: recipe
+                })
+                return
+            }
+            res.status(400).json({
+                success: false,
+                message: 'User do not have any recipe',
+                data: ""
+            })
+
+
+        } catch (error) {
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: ""
+            })
+        }
+    }
+
 }
+
 
 
 module.exports = new recipeController
