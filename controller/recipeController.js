@@ -69,56 +69,76 @@ class recipeController {
     }
 
     handleCreateRecipe = async (req, res) => {
-        // let uploadFile = multerConfig('public/image/step', "step")
-        // uploadFile( req, res, async (error) => {
-
-        // })
-        let { name, amount, status, prepareTime, cookTime, ingredient, step } = req.body
-            if(!name || !amount || !prepareTime || !cookTime || !status) {
-                res.status(418).json({
-                    status: false,
-                    message: 'Please provide all required fields',
-                    data: ""
-                })
-                return
-            }
-            try {
-                let  userId = req.userId
-                const result = await sequelize.transaction(async t => {
-                    let recipe = await db.Recipe.create({
-                        recipeName: name,
-                        date: Date.now(),
-                        amount: amount,
-                        status: status,
-                        preparationTime: prepareTime,
-                        cookingTime: cookTime,
-                        userId: userId
-                    }, { transaction: t })
-                    ingredient = ingredient.map(item => {
-                        item.recipeId = recipe.recipeId
-                        return item
-                    })
-                    step = step.map(item => {
-                        item.recipeId = recipe.recipeId
-                        item.image = req.file ? `/user/${req.file.filename}` : null
-                        return item
-                    })
-                    let ingre = await db.DetailIngredient.bulkCreate(ingredient, { transaction: t })
-                    let stepRes = await db.Step.bulkCreate(step, { transaction: t })
-                    return {recipe, ingre, stepRes}
-                })
-                res.status(200).json({
-                    success: true, 
-                    message: 'Successfully added',
-                    data: result
-                })
-            } catch (error) {
-                res.status(500).json({
+        let uploadFile = multerConfig.multerConfig2().fields(
+            [
+                {
+                    name: 'recipe',
+                    maxCount: 1
+                },
+                {
+                    name: 'step',
+                    maxCount: 20
+                }
+            ]
+        )
+        uploadFile( req, res, async (error) => {
+            let { name, amount, status, prepareTime, cookTime, ingredient, step, check } = req.body
+            if(error) {
+                return res.status(440).json({
                     success: false, 
-                    message: error, 
+                    message: `Error when trying to upload: ${error}`,
                     data: ""
-                })
-            }
+                });
+            }    
+                if(!name || !amount || !prepareTime || !cookTime || !status) {
+                    res.status(418).json({
+                        status: false,
+                        message: 'Please provide all required fields',
+                        data: ""
+                    })
+                    return
+                }
+                try {
+                    let  userId = req.userId
+                    const result = await sequelize.transaction(async t => {
+                        let recipe = await db.Recipe.create({
+                            recipeName: name,
+                            date: Date.now(),
+                            amount: amount,
+                            status: status,
+                            preparationTime: prepareTime,
+                            image: req.files.recipe[0] ? `/recipe/${req.files.recipe[0].filename}` : null,
+                            cookingTime: cookTime,
+                            userId: userId
+                        }, { transaction: t })
+                        ingredient = ingredient.map(item => {
+                            item.recipeId = recipe.recipeId
+                            return item
+                        })
+                        let i = 0
+                        step = step.map(item => {
+                            item.image = req.files.step[check[i]] ? `/step/${req.files.step[check[i]].filename}` : null
+                            item.recipeId = recipe.recipeId
+                            i++
+                            return item
+                        })
+                        let ingre = await db.DetailIngredient.bulkCreate(ingredient, { transaction: t })
+                        let stepRes = await db.Step.bulkCreate(step, { transaction: t })
+                        return {recipe, ingre, stepRes}
+                    })
+                    res.status(200).json({
+                        success: true, 
+                        message: 'Successfully added',
+                        data: result
+                    })
+                } catch (error) {
+                    res.status(500).json({
+                        success: false, 
+                        message: error.message, 
+                        data: ""
+                    })
+                }
+        })
     }
 
     handleUpdateRecpipe = async (req, res) => {

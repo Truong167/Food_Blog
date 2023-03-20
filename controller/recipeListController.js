@@ -37,7 +37,12 @@ class recipeListController {
     }
 
     handleCreateRecipeList = async (req, res) => {
-        let uploadFile = multerConfig.multerConfig('public/image/recipeList', "recipeList") 
+        let uploadFile = multerConfig.multerConfig2().fields([
+            {
+                name: 'recipeList',
+                maxCount: 1
+            }
+        ]) 
         uploadFile(req, res, async (error) => {
             let { name } = req.body
             if(error) {
@@ -62,7 +67,7 @@ class recipeListController {
                     name: name,
                     date: Date.now(),
                     userId: userId,
-                    image: req.file ? `/recipeList/${req.file.filename}` : null
+                    image: req.files.recipeList[0] ? `/recipeList/${req.files.recipeList[0].filename}` : null
                 })
                 res.status(200).json({
                     success: true,
