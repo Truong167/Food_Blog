@@ -93,14 +93,13 @@ class userController {
 
     handleUpdateUser = async (req, res) => {
         const userId  = req.userId
-        let uploadFile = multerConfig.multerConfig2(userId).fields([
+        let uploadFile = multerConfig(userId).fields([
             {
                 name: 'user',
                 maxCount: 1
             },
         ])
         uploadFile(req, res, async (error) => {
-            console.log(req.files)
             const { fullName, dateOfBirth, address, email, introduce } = req.body
             if(error) {
                 return res.status(440).json({
@@ -134,7 +133,7 @@ class userController {
                     user.dateOfBirth = dateOfBirth
                     user.address = address
                     user.email = email
-                    user.avatar = req.files.user[0] ? `/user/${req.files.user[0].filename}` : null
+                    user.avatar = req.files.user ? `/user/${req.files.user[0].filename}` : null
                     user.introduce = introduce ? introduce : ''
                     
                     let updated = await user.save()

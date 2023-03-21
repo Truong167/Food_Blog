@@ -37,7 +37,7 @@ class recipeListController {
     }
 
     handleCreateRecipeList = async (req, res) => {
-        let uploadFile = multerConfig.multerConfig2().fields([
+        let uploadFile = multerConfig().fields([
             {
                 name: 'recipeList',
                 maxCount: 1
@@ -48,7 +48,7 @@ class recipeListController {
             if(error) {
                 res.status(440).json({
                     success: false,
-                    message: error,
+                    message: error.message,
                     data: ""
                 })
                 return
@@ -67,7 +67,7 @@ class recipeListController {
                     name: name,
                     date: Date.now(),
                     userId: userId,
-                    image: req.files.recipeList[0] ? `/recipeList/${req.files.recipeList[0].filename}` : null
+                    image: req.files.recipeList ? `/recipeList/${req.files.recipeList[0].filename}` : null
                 })
                 res.status(200).json({
                     success: true,
@@ -77,7 +77,7 @@ class recipeListController {
             } catch (error) {
                 res.status(500).json({
                     success: false, 
-                    message: error,
+                    message: error.message,
                     data: ""
                 })
             }
@@ -86,16 +86,20 @@ class recipeListController {
     }
 
     handleCreateRecipeList1 = async (req, res) => {
-        let uploadFile = multerConfig.multerConfig1('public/image/recipeList', "recipeList") 
+        let uploadFile = multerConfig().fields([
+            {
+                name: 'recipeList',
+                maxCount: 2
+            }
+        ]) 
         uploadFile(req, res, async (error) => {
             let { name } = req.body
             if(error) {
-                res.status(440).json({
-                    success: false,
-                    message: error,
+                return res.status(440).json({
+                    success: false, 
+                    message: `Error when trying to upload: ${error}`,
                     data: ""
                 })
-                return
             }
             if(!name) {
                 res.status(418).json({
@@ -107,7 +111,7 @@ class recipeListController {
             }
             try {
                 let userId = req.userId
-                let file = req.files.map(item => {
+                let file = req.files.recipeList.map(item => {
                     let arr = []
                     arr.push(`/recipeList/${item.filename}`)
                     return arr

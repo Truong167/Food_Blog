@@ -69,7 +69,7 @@ class recipeController {
     }
 
     handleCreateRecipe = async (req, res) => {
-        let uploadFile = multerConfig.multerConfig2().fields(
+        let uploadFile = multerConfig().fields(
             [
                 {
                     name: 'recipe',
@@ -107,21 +107,26 @@ class recipeController {
                             amount: amount,
                             status: status,
                             preparationTime: prepareTime,
-                            image: req.files.recipe[0] ? `/recipe/${req.files.recipe[0].filename}` : null,
+                            image: req.files.recipe ? `/recipe/${req.files.recipe[0].filename}` : null,
                             cookingTime: cookTime,
                             userId: userId
                         }, { transaction: t })
+                        // let ingredient = [
+                        //     {"ingredientId": "thitheo", "amount": "2kg"}
+                        // ]
+                        // let step = [
+                        //     {"stepIndex": 1, "description": "TESSTTT"},
+                        //     {"stepIndex": 2, "description": "TESSTTT"},
+                        //     {"stepIndex": 3, "description": "TESSTTT"}
+                        // ]
                         ingredient = ingredient.map(item => {
                             item.recipeId = recipe.recipeId
                             return item
                         })
-                        let i = 0
-                        step = step.map(item => {
-                            item.image = req.files.step[check[i]] ? `/step/${req.files.step[check[i]].filename}` : null
-                            item.recipeId = recipe.recipeId
-                            i++
-                            return item
-                        })
+                        for(let i = 0; i < step.length; i++){
+                            step[i].image = req.files.step[check[i]] ? `/step/${req.files.step[check[i]].filename}` : null
+                            step[i].recipeId = recipe.recipeId
+                        }
                         let ingre = await db.DetailIngredient.bulkCreate(ingredient, { transaction: t })
                         let stepRes = await db.Step.bulkCreate(step, { transaction: t })
                         return {recipe, ingre, stepRes}
@@ -153,10 +158,9 @@ class recipeController {
                     item.recipeId = recipe.recipeId
                     return item
                 })
-                let stepRes = await db.Step.bulkCreate(step, {
-                    updateOnDuplicate: ["stepIndex", "description"],
+                await db.Step.bulkCreate(step, {
+                    updateOnDuplicate: ["stepId", "stepIndex", "description"],
                 })
-                console.log(stepRes)
                 // recipe.recipeName = name
                 // recipe.amount = amount
                 // recipe.preparationTime = prepareTime
@@ -361,15 +365,12 @@ class recipeController {
     updatePrivacyOfRecipe = async (req, res) => {
         try {
             let { id } = req.params
+            let {status} = req.body
 
             let recipe = await db.Recipe.findByPk(id)
 
             if(recipe) {
-                if(recipe.status == "CK"){
-                    recipe.status = "RT"
-                } else {
-                    recipe.status = "CK"
-                }
+                recipe.status = status
 
                 let recipeData = await recipe.save()
                 res.status(200).json({
