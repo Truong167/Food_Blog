@@ -124,7 +124,7 @@ class recipeController {
                             return item
                         })
                         for(let i = 0; i < step.length; i++){
-                            step[i].image = req.files.step[check[i]] ? `/step/${req.files.step[check[i]].filename}` : null
+                            step[i].image = req.files.step[i] ? `/step/${req.files.step[i].filename}` : null
                             step[i].recipeId = recipe.recipeId
                         }
                         let ingre = await db.DetailIngredient.bulkCreate(ingredient, { transaction: t })
@@ -147,47 +147,75 @@ class recipeController {
     }
 
     handleUpdateRecpipe = async (req, res) => {
-        try {
-            let { name, amount, prepareTime, cookTime, step } = req.body
-            let recipeId  = req.params.id
-
-            let recipe = await db.Recipe.findByPk(recipeId)
-
-            if(recipe) {
-                step = step.map(item => {
-                    item.recipeId = recipe.recipeId
-                    return item
-                })
-                await db.Step.bulkCreate(step, {
-                    updateOnDuplicate: ["stepId", "stepIndex", "description"],
-                })
-                // recipe.recipeName = name
-                // recipe.amount = amount
-                // recipe.preparationTime = prepareTime
-                // recipe.cookingTime = cookTime
-
-                // await recipe.save()
-
-                res.status(200).json({
-                    success: true, 
-                    message: 'Successfully updated recipe',
-                    data: ""
-                })
-            } else {
-                res.status(432).json({
-                    success: false, 
-                    message: 'Recipe not found',
+        let uploadFile = multerConfig().fields([
+            {
+                name: "recipe",
+                maxCount: 1
+            },
+            {
+                name: "step",
+                maxCount: 20
+            }
+        ])
+        uploadFile(req, res, async error => {
+            if(error){
+                return res.status(440).json({
+                    success: false,
+                    message: `Error when trying to upload: ${error}`,
                     data: ""
                 })
             }
+            try {
+                let { name, amount, prepareTime, cookTime, step, ingredient } = req.body
+                let recipeId  = req.params.id
+    
+                let recipe = await db.Recipe.findByPk(recipeId)
+    
+                if(recipe) {
+                    step = step.map(item => {
+                        item.recipeId = recipe.recipeId
+                        return item
+                    })
+                    ingredient = ingredient.map(item => {
+                        item.recipeId = recipe.recipeId
+                        return item
+                    })
+                    await db.Step.bulkCreate(step, {
+                        updateOnDuplicate: ["stepId", "stepIndex", "description"],
+                    })
 
-        } catch (error) {
-            res.status(500).json({
-                success: false, 
-                message: error.message,
-                data: ""
-            })
-        }
+                    await db.DetailIngredient.bulkCreate(ingredient, {
+                        updateOnDuplicate: ["amount"]
+                    })
+
+                    recipe.recipeName = name
+                    recipe.amount = amount
+                    recipe.preparationTime = prepareTime
+                    recipe.cookingTime = cookTime
+    
+                    await recipe.save()
+    
+                    res.status(200).json({
+                        success: true, 
+                        message: 'Successfully updated recipe',
+                        data: ""
+                    })
+                } else {
+                    res.status(432).json({
+                        success: false, 
+                        message: 'Recipe not found',
+                        data: ""
+                    })
+                }
+    
+            } catch (error) {
+                res.status(500).json({
+                    success: false, 
+                    message: error.message,
+                    data: ""
+                })
+            }
+        })
     }
 
     handleDeleteRecipe = async (req, res) => {

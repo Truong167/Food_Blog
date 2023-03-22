@@ -7,6 +7,7 @@ const {
 const {sequelize} = require('../models/index');
 const { Op } = require('sequelize');
 require('dotenv').config()
+const fs = require('fs')
 
 
 
@@ -93,7 +94,7 @@ class userController {
 
     handleUpdateUser = async (req, res) => {
         const userId  = req.userId
-        let uploadFile = multerConfig(userId).fields([
+        let uploadFile = multerConfig().fields([
             {
                 name: 'user',
                 maxCount: 1
@@ -128,14 +129,21 @@ class userController {
 
             try {
                 let user = await db.User.findByPk(userId)
+                let oldImage = user.avatar
                 if(user) {
                     user.fullName = fullName
                     user.dateOfBirth = dateOfBirth
                     user.address = address
                     user.email = email
-                    user.avatar = req.files.user ? `/user/${req.files.user[0].filename}` : null
+                    user.avatar = req.files.user ? `/user/${req.files.user[0].filename}` : oldImage
                     user.introduce = introduce ? introduce : ''
                     
+                    if(req.files.user && oldImage !== null){
+                        fs.unlink(`public/image${oldImage}`, error => {
+                            if(error) throw error
+                        })
+                    }
+
                     let updated = await user.save()
     
                     res.status(200).json({

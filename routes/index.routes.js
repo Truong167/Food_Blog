@@ -7,6 +7,7 @@ const commentRouter = require('./comment.routes')
 const favoriteRouter = require('./favorite.routes')
 const followRouter = require('./follow.routes')
 const authRouter = require('./auth.routes')
+const stepRouter = require('./step.routes')
 const verifyToken = require('../middlewares/auth')
 
 
@@ -24,6 +25,7 @@ function routes(app){
     app.use('/api/v1/comment',verifyToken, commentRouter)
     app.use('/api/v1/favorite',verifyToken, favoriteRouter)
     app.use('/api/v1/follow',verifyToken, followRouter)
+    app.use('api/v1/step', verifyToken, stepRouter)
     app.use('/api/v1/auth', authRouter)
     
     // app.use('/api/v1/user', userRouter)
@@ -33,6 +35,7 @@ function routes(app){
     // app.use('/api/v1/comment', commentRouter)
     // app.use('/api/v1/favorite', favoriteRouter)
     // app.use('/api/v1/follow', followRouter)
+    // app.use('/api/v1/step', stepRouter)
     // app.use('/api/v1/auth', authRouter)
     app.use('/', (req, res) => {res.send({ message: 'Đây là Food Blog Web Services' })});
 }

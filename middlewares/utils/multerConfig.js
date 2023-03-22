@@ -1,6 +1,6 @@
 let multer = require("multer");
 
-function multerConfig(name = ''){
+function multerConfig(){
   let diskStorage = multer.diskStorage({
       destination: (req, file, callback) => {
         // Định nghĩa nơi file upload sẽ được lưu lại
@@ -23,12 +23,7 @@ function multerConfig(name = ''){
           let errorMess = `The file <strong>${file.originalname}</strong> is invalid. Only allowed to upload image jpeg, png, jpg.`;
           return callback(errorMess, null);
         }
-        if(name == ''){
-          callback(null, `${Date.now()}-${file.originalname}`)
-        } else {
-          callback(null, `${name}-${file.originalname}`)
-
-        }
+        callback(null, `${Date.now()}-${file.originalname}`)
       }
     });
   
