@@ -184,9 +184,11 @@ class recipeController {
                             item.recipeId = recipe.recipeId
                             return item
                         })
+                        let index = 0
                         for(let i = 0; i < data.Steps.length; i++){
-                            Steps[i].image = req.files.step[i] ? `/step/${req.files.step[i].filename}` : null
+                            Steps[i].image = Steps[i].image ? `/step/${req.files.step[index].filename}` : null
                             Steps[i].recipeId = recipe.recipeId
+                            index++
                         }
                         let ingre = await db.DetailIngredient.bulkCreate(DetailIngredients, { transaction: t })
                         let stepRes = await db.Step.bulkCreate(Steps, { transaction: t })
