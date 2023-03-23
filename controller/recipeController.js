@@ -156,6 +156,7 @@ class recipeController {
                 //     return
                 // }
                 try {
+                    data = JSON.parse(data)
                     let DetailIngredients = data.DetailIngredients
                     let Steps = data.Steps
                     let  userId = req.userId
