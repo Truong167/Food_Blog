@@ -91,6 +91,7 @@ class recipeController {
                 });
             } 
             console.log("data", data) 
+            console.log("type", typeof data) 
             console.log("recipeName", data.recipeName) 
             console.log(req.files)  
             if(!data){
