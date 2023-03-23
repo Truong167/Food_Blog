@@ -154,8 +154,8 @@ class recipeController {
                 //     return
                 // }
                 try {
-                    let DetailIngredients = JSON.parse(data.DetailIngredients)
-                    let Steps = JSON.parse(data.Steps)
+                    // let DetailIngredients = JSON.parse(data.DetailIngredients)
+                    let Steps = data.Steps
                     let  userId = req.userId
                     console.log(req.files)
                     const result = await sequelize.transaction(async t => {
@@ -178,11 +178,11 @@ class recipeController {
                         //     {"stepIndex": 2, "description": "TESSTTT"},
                         //     {"stepIndex": 3, "description": "TESSTTT"}
                         // ]
-                        DetailIngredients = DetailIngredients.map(item => {
+                        let DetailIngredients  = data.DetailIngredients.map(item => {
                             item.recipeId = recipe.recipeId
                             return item
                         })
-                        for(let i = 0; i < Steps.length; i++){
+                        for(let i = 0; i < data.Steps.length; i++){
                             Steps[i].image = req.files.step[i] ? `/step/${req.files.step[i].filename}` : null
                             Steps[i].recipeId = recipe.recipeId
                         }
