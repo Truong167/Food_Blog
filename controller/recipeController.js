@@ -90,10 +90,55 @@ class recipeController {
                     data: ""
                 });
             }    
-                if(!recipeName || !amount || !preparationTime || !cookingTime || !status || !DetailIngredients || !Steps) {
+            // if(!recipeName || !amount || !preparationTime || !cookingTime || !status || !DetailIngredients || !Steps) {
+
+                if(!recipeName) {
                     res.status(418).json({
                         status: false,
-                        message: 'Please provide all required fields',
+                        message: 'Please provide all required fields: recipeName',
+                        data: ""
+                    })
+                    return
+                } else if(!amount){
+                    res.status(418).json({
+                        status: false,
+                        message: 'Please provide all required fields: amount',
+                        data: ""
+                    })
+                    return
+                }else if(!preparationTime){
+                    res.status(418).json({
+                        status: false,
+                        message: 'Please provide all required fields: preparationTime',
+                        data: ""
+                    })
+                    return
+                }else if(!status){
+                    res.status(418).json({
+                        status: false,
+                        message: 'Please provide all required fields: status',
+                        data: ""
+                    })
+                    return
+                }else if(!DetailIngredients){
+                    res.status(418).json({
+                        status: false,
+                        message: 'Please provide all required fields: DetailIngredients',
+                        data: ""
+                    })
+                    return
+                }else if(!Steps){
+                    res.status(418).json({
+                        status: false,
+                        message: 'Please provide all required fields: Steps',
+                        data: ""
+                    })
+                    return
+                }
+                else if(!cookingTime){
+                    res.status(418).json({
+                        status: false,
+                        message: 'Please provide all required fields: cookingTime',
                         data: ""
                     })
                     return
