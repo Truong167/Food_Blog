@@ -92,17 +92,17 @@ class recipeController {
             }    
             // if(!recipeName || !amount || !preparationTime || !cookingTime || !status || !DetailIngredients || !Steps) {
 
-                if(!recipeName) {
-                    res.status(418).json({
-                        status: false,
-                        message: 'Please provide all required fields: recipeName',
-                        data: ""
-                    })
-                    return
-                } else if(!amount){
+                if(!amount) {
                     res.status(418).json({
                         status: false,
                         message: 'Please provide all required fields: amount',
+                        data: ""
+                    })
+                    return
+                } else if(!recipeName){
+                    res.status(418).json({
+                        status: false,
+                        message: 'Please provide all required fields: recipeName',
                         data: ""
                     })
                     return
