@@ -82,6 +82,143 @@ class recipeController {
             ]
         )
         uploadFile( req, res, async (error) => {
+            let { data} = req.body
+            if(error) {
+                return res.status(440).json({
+                    success: false, 
+                    message: `Error when trying to upload: ${error.message}`,
+                    data: ""
+                });
+            } 
+            console.log(data) 
+            console.log(req.files)  
+            if(!data){
+                res.status(418).json({
+                            status: false,
+                            message: 'Please provide all required fields: data',
+                            data: ""
+                        })
+                        return
+            }
+            // if(!recipeName || !amount || !preparationTime || !cookingTime || !status || !DetailIngredients || !Steps) {
+
+                // if(!amount) {
+                //     res.status(418).json({
+                //         status: false,
+                //         message: 'Please provide all required fields: amount',
+                //         data: ""
+                //     })
+                //     return
+                // } else if(!recipeName){
+                //     res.status(418).json({
+                //         status: false,
+                //         message: 'Please provide all required fields: recipeName',
+                //         data: ""
+                //     })
+                //     return
+                // }else if(!preparationTime){
+                //     res.status(418).json({
+                //         status: false,
+                //         message: 'Please provide all required fields: preparationTime',
+                //         data: ""
+                //     })
+                //     return
+                // }else if(!status){
+                //     res.status(418).json({
+                //         status: false,
+                //         message: 'Please provide all required fields: status',
+                //         data: ""
+                //     })
+                //     return
+                // }else if(!DetailIngredients){
+                //     res.status(418).json({
+                //         status: false,
+                //         message: 'Please provide all required fields: DetailIngredients',
+                //         data: ""
+                //     })
+                //     return
+                // }else if(!Steps){
+                //     res.status(418).json({
+                //         status: false,
+                //         message: 'Please provide all required fields: Steps',
+                //         data: ""
+                //     })
+                //     return
+                // }
+                // else if(!cookingTime){
+                //     res.status(418).json({
+                //         status: false,
+                //         message: 'Please provide all required fields: cookingTime',
+                //         data: ""
+                //     })
+                //     return
+                // }
+                try {
+                    let DetailIngredients = JSON.parse(data.DetailIngredients)
+                    let Steps = JSON.parse(data.Steps)
+                    let  userId = req.userId
+                    console.log(req.files)
+                    const result = await sequelize.transaction(async t => {
+                        let recipe = await db.Recipe.create({
+                            recipeName: data.recipeName,
+                            date: Date.now(),
+                            amount: data.amount,
+                            status: data.status,
+                            preparationTime: data.preparationTime,
+                            image: req.files.recipe ? `/recipe/${req.files.recipe[0].filename}` : null,
+                            cookingTime: data.cookingTime,
+                            description: data.description ? data.description : null,
+                            userId: userId
+                        }, { transaction: t })
+                        // let ingredientName = [
+                        //     {"ingredientNameId": "thitheo", "amount": "2kg"}
+                        // ]
+                        // let step = [
+                        //     {"stepIndex": 1, "description": "TESSTTT"},
+                        //     {"stepIndex": 2, "description": "TESSTTT"},
+                        //     {"stepIndex": 3, "description": "TESSTTT"}
+                        // ]
+                        DetailIngredients = DetailIngredients.map(item => {
+                            item.recipeId = recipe.recipeId
+                            return item
+                        })
+                        for(let i = 0; i < Steps.length; i++){
+                            Steps[i].image = req.files.step[i] ? `/step/${req.files.step[i].filename}` : null
+                            Steps[i].recipeId = recipe.recipeId
+                        }
+                        let ingre = await db.DetailIngredient.bulkCreate(DetailIngredients, { transaction: t })
+                        let stepRes = await db.Step.bulkCreate(Steps, { transaction: t })
+                        return {recipe, ingre, stepRes}
+                    })
+                    res.status(200).json({
+                        success: true, 
+                        message: 'Successfully added',
+                        data: result
+                    })
+                } catch (error) {
+                    res.status(500).json({
+                        success: false, 
+                        message: error.message, 
+                        data: ""
+                    })
+                }
+        })
+    }
+
+    handleCreateRecipe1 = async (req, res) => {
+        let uploadFile = multerConfig().fields(
+            [
+                {
+                    name: 'recipe',
+                    maxCount: 1
+                },
+                {
+                    name: 'step',
+                    maxCount: 20
+                }
+            ]
+        )
+        uploadFile( req, res, async (error) => {
             let { recipeName, amount, status, preparationTime, cookingTime, description, DetailIngredients, Steps} = req.body
             if(error) {
                 return res.status(440).json({
@@ -194,6 +331,7 @@ class recipeController {
                 }
         })
     }
+
 
     handleUpdateRecpipe = async (req, res) => {
         let uploadFile = multerConfig().fields([
