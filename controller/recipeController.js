@@ -154,7 +154,7 @@ class recipeController {
                 //     return
                 // }
                 try {
-                    // let DetailIngredients = JSON.parse(data.DetailIngredients)
+                    let DetailIngredients = data.DetailIngredients
                     let Steps = data.Steps
                     let  userId = req.userId
                     console.log(req.files)
@@ -178,7 +178,7 @@ class recipeController {
                         //     {"stepIndex": 2, "description": "TESSTTT"},
                         //     {"stepIndex": 3, "description": "TESSTTT"}
                         // ]
-                        let DetailIngredients  = data.DetailIngredients.map(item => {
+                        DetailIngredients  = data.DetailIngredients.map(item => {
                             item.recipeId = recipe.recipeId
                             return item
                         })
