@@ -82,15 +82,15 @@ class recipeController {
             ]
         )
         uploadFile( req, res, async (error) => {
-            let { name, amount, status, prepareTime, cookTime, ingredient, step, check } = req.body
+            let { recipeName, amount, status, preparationTime, cookingTime, description, ingredient, step} = req.body
             if(error) {
                 return res.status(440).json({
                     success: false, 
-                    message: `Error when trying to upload: ${error}`,
+                    message: `Error when trying to upload: ${error.message}`,
                     data: ""
                 });
             }    
-                if(!name || !amount || !prepareTime || !cookTime || !status) {
+                if(!recipeName || !amount || !preparationTime || !cookingTime || !status || !ingredient || !step) {
                     res.status(418).json({
                         status: false,
                         message: 'Please provide all required fields',
@@ -99,16 +99,19 @@ class recipeController {
                     return
                 }
                 try {
+                    ingredient = JSON.parse(ingredient)
+                    step = JSON.parse(step)
                     let  userId = req.userId
                     const result = await sequelize.transaction(async t => {
                         let recipe = await db.Recipe.create({
-                            recipeName: name,
+                            recipeName: recipeName,
                             date: Date.now(),
                             amount: amount,
                             status: status,
-                            preparationTime: prepareTime,
+                            preparationTime: preparationTime,
                             image: req.files.recipe ? `/recipe/${req.files.recipe[0].filename}` : null,
-                            cookingTime: cookTime,
+                            cookingTime: cookingTime,
+                            description: description ? description : null,
                             userId: userId
                         }, { transaction: t })
                         // let ingredient = [
