@@ -102,6 +102,7 @@ class recipeController {
                     DetailIngredients = JSON.parse(DetailIngredients)
                     Steps = JSON.parse(Steps)
                     let  userId = req.userId
+                    console.log(req.files)
                     const result = await sequelize.transaction(async t => {
                         let recipe = await db.Recipe.create({
                             recipeName: recipeName,
