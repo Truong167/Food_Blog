@@ -90,7 +90,8 @@ class recipeController {
                     data: ""
                 });
             } 
-            console.log(data) 
+            console.log("data", data) 
+            console.log("recipeName", data.recipeName) 
             console.log(req.files)  
             if(!data){
                 res.status(418).json({
@@ -157,7 +158,6 @@ class recipeController {
                     let DetailIngredients = data.DetailIngredients
                     let Steps = data.Steps
                     let  userId = req.userId
-                    console.log(req.files)
                     const result = await sequelize.transaction(async t => {
                         let recipe = await db.Recipe.create({
                             recipeName: data.recipeName,
