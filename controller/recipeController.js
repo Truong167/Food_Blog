@@ -903,7 +903,7 @@ class recipeController {
                 res.status(200).json({
                     success: true,
                     message: "Successfully get data",
-                    data: newData
+                    data: recipe
                 })
                 return
             }
