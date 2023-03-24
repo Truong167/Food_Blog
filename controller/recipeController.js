@@ -895,10 +895,32 @@ class recipeController {
                     userId: userId
                 },
                 order: [["date", "DESC"]],
-                attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image", "status"]
+                attributes: [
+                    "recipeId", "recipeName", "date", "numberOfLikes", "image", "status",
+                    [sequelize.literal(`(SELECT CASE WHEN EXISTS 
+                        (SELECT * FROM "Favorite" WHERE "recipeId" = "Recipe"."recipeId" and "userId" = ${userId}) 
+                        THEN True ELSE False end isFavorite) `), "isFavorite"]
+                ], 
+                include: [
+                    {
+                        model: db.DetailList,
+                        include: {
+                            model: db.RecipeList,
+                            attributes: ["name"]
+                        },
+                        attributes: ["recipeListId"]
+                    }, 
+                ]
             })
             const user = await db.User.findByPk(userId)
             if(recipe && recipe.length > 0) {
+                recipe.map(item => {
+                    item.dataValues.DetailLists.map(item => {
+                        item.dataValues.name = item.dataValues.RecipeList.dataValues.name
+                        delete item.dataValues['RecipeList']
+                        return item
+                    })
+                })
                 const newData = {user, recipe}
                 res.status(200).json({
                     success: true,
