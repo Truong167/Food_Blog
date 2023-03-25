@@ -136,7 +136,7 @@ class authController {
             })
 
             const accessToken = jwt.sign({userId: account.userId}, process.env.ACCESS_TOKEN_SECRET, {
-                expiresIn: '2h'
+                expiresIn: '365d'
             })
             res.status(200).json({
                 success: true,
