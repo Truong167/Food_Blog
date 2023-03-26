@@ -11,7 +11,12 @@ class favoriteController {
             let { recipeId } = req.params
             let userId = req.userId
             let recipe = await db.Recipe.findByPk(recipeId)
-            if(recipe) {
+            let checkFavorite = await db.Favorite.findOne({where: {
+                userId: userId,
+                recipeId: recipeId,
+            }})
+            console.log(checkFavorite)
+            if(recipe && !checkFavorite) {
                 let favorite = await db.Favorite.create({
                     userId: userId,
                     recipeId: recipeId,
@@ -29,13 +34,19 @@ class favoriteController {
                     message: 'Successfully',
                     data: favorite
                 })
-                return
+            } else if(!recipe) {
+                res.status(432).json({
+                    success: false, 
+                    message: 'Recipe not found',
+                    data: ""
+                })
+            } else {
+                res.status(444).json({
+                    success: false, 
+                    message: 'User liked this recipe',
+                    data: ""
+                })
             }
-            res.status(432).json({
-                success: false, 
-                message: 'Recipe not found',
-                data: ""
-            })
         } catch (error) {
             res.status(500).json({
                 success: false, 
@@ -65,13 +76,19 @@ class favoriteController {
                 })
                 recipe.numberOfLikes = count
                 await recipe.save()
-                return
+            } else if(!recipe) {
+                res.status(432).json({
+                    success: false, 
+                    message: 'Recipe not found',
+                    data: ""
+                })
+            } else {
+                res.status(445).json({
+                    success: false, 
+                    message: 'User has unliked this recipe',
+                    data: ""
+                })
             }
-            res.status(432).json({
-                success: false, 
-                message: 'Recipe not found',
-                data: ""
-            })
         } catch (error) {
             res.status(500).json({
                 success: false, 
