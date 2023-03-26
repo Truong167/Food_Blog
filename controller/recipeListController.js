@@ -251,13 +251,13 @@ class recipeListController {
             let dtRecipe = await db.DetailList.findOne({where: {recipeListId: recipeListId, recipeId: recipeId}})
             if(!recipe) {
                 res.status(432).json({
-                    success: true,
+                    success: false,
                     message: 'Recipe not found',
                     data: ""
                 })
             } else if(dtRecipe) {
-                res.status(432).json({
-                    success: true,
+                res.status(443).json({
+                    success: false,
                     message: 'Recipe is exist in recipe list',
                     data: ""
                 })
@@ -297,7 +297,7 @@ class recipeListController {
                 return
             }
             res.status(432).json({
-                success: true, 
+                success: false, 
                 message: 'Recipe not found',
                 data: ""
             })
