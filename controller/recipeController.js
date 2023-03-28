@@ -90,10 +90,6 @@ class recipeController {
                     data: ""
                 });
             } 
-            console.log("data", data) 
-            console.log("type", typeof data) 
-            console.log("recipeName", data.recipeName) 
-            console.log(req.files)  
             if(!data){
                 res.status(418).json({
                             status: false,
@@ -172,14 +168,6 @@ class recipeController {
                             description: data.description ? data.description : null,
                             userId: userId
                         }, { transaction: t })
-                        // let ingredientName = [
-                        //     {"ingredientNameId": "thitheo", "amount": "2kg"}
-                        // ]
-                        // let step = [
-                        //     {"stepIndex": 1, "description": "TESSTTT"},
-                        //     {"stepIndex": 2, "description": "TESSTTT"},
-                        //     {"stepIndex": 3, "description": "TESSTTT"}
-                        // ]
                         DetailIngredients  = data.DetailIngredients.map(item => {
                             item.recipeId = recipe.recipeId
                             return item
@@ -361,40 +349,75 @@ class recipeController {
                 })
             }
             try {
-                let { name, amount, prepareTime, cookTime, step, ingredient } = req.body
+                let { data } = req.body
                 let recipeId  = req.params.id
     
                 let recipe = await db.Recipe.findByPk(recipeId)
-    
+                let ingredient = await db.DetailIngredient.findAll({where: {recipeId: recipeId}})
+                let step = await db.Step.findAll({where: {recipeId: recipeId}})
+                data = JSON.parse(data)
+                let DetailIngredients = data.DetailIngredients
+                let Steps = data.Steps
+                step = step.filter(({ stepId: id1 }) => !Steps.some(({ stepId: id2 }) => id2 === id1) );
+                step = step.map(item => {
+                    return item.dataValues.stepId
+                })
+                ingredient = ingredient.filter(({ingredientId: id1}) => !DetailIngredients.some(({ingredientId: id2}) => id1 === id2))
+                ingredient = ingredient.map(item => {
+                    return item.dataValues.ingredientId
+                })
+                let index = 0
+                        for(let i = 0; i < Steps.length; i++){
+                            if(Steps[i].image != "") {
+                                Steps[i].image = `/step/${req.files.step[index].filename}`
+                                index++
+                            } else {
+                                // Steps[i].image = null
+                            }
+                        }
                 if(recipe) {
-                    step = step.map(item => {
-                        item.recipeId = recipe.recipeId
-                        return item
-                    })
-                    ingredient = ingredient.map(item => {
-                        item.recipeId = recipe.recipeId
-                        return item
-                    })
-                    await db.Step.bulkCreate(step, {
-                        updateOnDuplicate: ["stepId", "stepIndex", "description"],
+                    const updateRecipe = await sequelize.transaction(async t => {
+                        if(step.length > 0) {
+                            await db.Step.destroy({where: {
+                                stepId: {
+                                    [Op.or]: step
+                                }
+                            }}, {transaction: t})
+                            await db.Step.bulkCreate(Steps, {
+                                updateOnDuplicate: ["stepId", "stepIndex", "description"],
+                            } ,{transaction: t})
+                        } else {
+                            await db.Step.bulkCreate(Steps, {
+                                updateOnDuplicate: ["stepId", "stepIndex", "description"],
+                            } ,{transaction: t})
+                        }
+                        if(ingredient.length > 0) {
+                            await db.DetailIngredient.destroy({where: {
+                                ingredientId: {
+                                    [Op.or]: ingredient
+                                }
+                            }}, {transaction: t})
+                            await db.DetailIngredient.bulkCreate(DetailIngredients, {transaction: t})
+                        } else {
+                            await db.DetailIngredient.bulkCreate(DetailIngredients, {transaction: t})
+                        }
+                        recipe.recipeName = data.recipeName
+                        recipe.amount = data.amount
+                        recipe.preparationTime = data.preparationTime
+                        recipe.cookingTime = data.cookingTime
+                        recipe.status = data.status
+                        recipe.description = data.description
+                        recipe.image = req.files.recipe ? `/recipe/${req.files.recipe[0].filename}` : recipe.image
+        
+                        await recipe.save({transaction: t})
+        
+                        res.status(200).json({
+                            success: true, 
+                            message: 'Successfully updated recipe',
+                            data: ""
+                        })
                     })
 
-                    await db.DetailIngredient.bulkCreate(ingredient, {
-                        updateOnDuplicate: ["amount"]
-                    })
-
-                    recipe.recipeName = name
-                    recipe.amount = amount
-                    recipe.preparationTime = prepareTime
-                    recipe.cookingTime = cookTime
-    
-                    await recipe.save()
-    
-                    res.status(200).json({
-                        success: true, 
-                        message: 'Successfully updated recipe',
-                        data: ""
-                    })
                 } else {
                     res.status(432).json({
                         success: false, 
@@ -483,7 +506,7 @@ class recipeController {
                     {
                         model: db.User,
                         attributes: [
-                            "userId", "fullName", "avatar",
+                            "userId", "fullName", "avatar", "introduce"
                             [sequelize.literal(` (SELECT CASE WHEN EXISTS 
                                 (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${userId}) 
                                 then True else False end isFollow) `), "isFollow"]
