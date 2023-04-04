@@ -12,6 +12,9 @@ class recipeController {
             const userId = req.userId
             // Select * from Recipe, User where Recipe.userId = User.userId
             let data = await db.Recipe.findAll({
+                where: {
+                    status: 'CK'
+                },     
                 include: [
                     {
                         model: db.User,
@@ -215,7 +218,8 @@ class recipeController {
             ]
         )
         uploadFile( req, res, async (error) => {
-            let { recipeName, amount, status, preparationTime, cookingTime, description, DetailIngredients, Steps} = req.body
+            console.log(req.body)
+            let { recipeName, amount, status, prepareTime, cookingTime, description, DetailIngredients, Steps} = req.body
             if(error) {
                 return res.status(440).json({
                     success: false, 
@@ -232,14 +236,16 @@ class recipeController {
                         data: ""
                     })
                     return
-                } else if(!recipeName){
+                } 
+                else if(!recipeName){
                     res.status(418).json({
                         status: false,
-                        message: 'Please provide all required fields: recipeName',
+                        message: `Please provide all required fields recipeName: ${recipeName}`,
                         data: ""
                     })
                     return
-                }else if(!preparationTime){
+                }
+                else if(!prepareTime){
                     res.status(418).json({
                         status: false,
                         message: 'Please provide all required fields: preparationTime',
@@ -506,7 +512,7 @@ class recipeController {
                     {
                         model: db.User,
                         attributes: [
-                            "userId", "fullName", "avatar", "introduce",
+                            "userId", "fullName", "avatar", "introduce", "address",
                             [sequelize.literal(` (SELECT CASE WHEN EXISTS 
                                 (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${userId}) 
                                 then True else False end isFollow) `), "isFollow"]
@@ -646,6 +652,9 @@ class recipeController {
             let { slug } = req.params
             let userId = req.userId
             let recipe = await db.Recipe.findAll({
+                where: {
+                    status: 'CK'
+                },
                 include: [ 
                     {
                         required: true,
@@ -721,10 +730,17 @@ class recipeController {
         try {
             let recipe = await db.Recipe.findAll({
                 where: {
-                    date: {
-                        [Op.lt]: today,
-                        [Op.gt]: newDate
-                    }
+                    [Op.and]: [
+                        {
+                            date: {
+                                [Op.lt]: today,
+                                [Op.gt]: newDate
+                            }
+                        },
+                        {
+                            status: 'CK'
+                        }
+                    ]
                     
                 },
                 include: [
@@ -816,9 +832,16 @@ class recipeController {
             let newFollowerData = followers.map(item => item.dataValues.userIdFollowed)
             let recipe = await db.Recipe.findAll({
                 where: {
-                    userId: {
-                        [Op.or]: [newFollowerData]
-                    }
+                    [Op.and]: [
+                        {
+                            userId: {
+                                [Op.or]: [newFollowerData]
+                            }
+                        },
+                        {
+                            status: 'CK'
+                        }
+                    ]
                 },
                 include: [
                     {

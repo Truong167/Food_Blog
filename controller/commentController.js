@@ -20,7 +20,8 @@ class commentController {
                         model: db.User,
                         attributes: ["fullName", "avatar"]
                     },
-                    attributes: {exclude: ["createdAt", "updatedAt"]}
+                    attributes: {exclude: ["createdAt", "updatedAt"]},
+                    order: [["date", "DESC"]]
                 })
                 if(comment && comment.length > 0) {
                     let commentCount = await db.Comment.count({where: {recipeId: recipeId}})
@@ -59,11 +60,12 @@ class commentController {
             let { recipeId } = req.params
             let userId = req.userId
             let { comment } = req.body
+            console.log(comment)
             let recipe = await db.Recipe.findByPk(recipeId)
             let checkComment = await db.Comment.findOne({where: {userId: userId, recipeId: recipeId}})
             if(checkComment){
                 res.status(437).json({
-                    success: true, 
+                    success: false, 
                     message: 'Users are only allowed to comment once per recipe',
                     data: ""
                 })
