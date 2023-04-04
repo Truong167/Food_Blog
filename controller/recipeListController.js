@@ -1,4 +1,4 @@
-
+const {sequelize} = require('../models/index')
 const db = require('../models/index')
 const multerConfig = require('../middlewares/utils/multerConfig')
 const fs = require('fs')
@@ -342,6 +342,37 @@ class recipeListController {
                 message: 'Recipe list not found',
                 data: ""
             })
+        } catch (error) {
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: ""
+            })
+        }
+    }
+
+    getBookmarkList = async (req, res) => {
+        try {
+            const userId = req.userId
+            const recipeId = req.params.recipeId
+            const recipeList = await db.RecipeList.findAll({
+                where: {
+                    userId: userId
+                },
+                attributes: ["recipeListId", "name", 
+                [sequelize.literal(` (SELECT CASE WHEN EXISTS 
+                    (Select * from "DetailList" where "recipeListId" = "RecipeList"."recipeListId" and "recipeId" = ${recipeId}) 
+                    then True else False end isBookmarked) `), "isBookmarked"]
+                ]
+
+            })
+            if(recipeList.length > 0){
+                res.status(200).json({
+                    success: true,
+                    message: 'Successfully get data',
+                    data: recipeList
+                })
+            }
         } catch (error) {
             res.status(500).json({
                 success: false, 

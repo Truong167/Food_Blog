@@ -11,6 +11,7 @@ const recipeListController = require('../controller/recipeListController')
 
 router.get("/getRecipeList", recipeListController.getRecipeList)
 router.get("/getRecipe/:recipeListId", recipeListController.getRecipe)
+router.get("/getBookmarkList/:recipeId", recipeListController.getBookmarkList)
 
 router.post('/createRecipeList', recipeListController.handleCreateRecipeList)
 router.post('/createRecipeList1', recipeListController.handleCreateRecipeList1)
