@@ -4,7 +4,7 @@ const router = express.Router()
 const recipeController = require('../controller/recipeController')
 
 
-// http://localhost:8080/api/v1/recipe/
+// http://localhost:8080/api/v1/recipe/getRecipeByUserId/userId
 
 router.get('/getAllRecipe', recipeController.getRecipe)
 router.get('/getRecipe/:id', recipeController.getDetailRecipe)
@@ -14,7 +14,7 @@ router.get('/getRecipeByIngredient/:slug', recipeController.getRecipeByIngredien
 router.get('/getPopularRecipe', recipeController.getPopularRecipe)
 router.get('/getRecipeFromFollowers', recipeController.getRecipeFromFollowers)
 router.get('/getRecipeByName/:slug', recipeController.handleGetRecipeByName)
-router.get('/getRecipeByUserId', recipeController.getRecipeByUserId)
+router.get('/getRecipeByUserId/:userId', recipeController.getRecipeByUserId)
 router.get('/getRecipeFavorite', recipeController.getRecipeFavorite)
 
 

@@ -41,7 +41,7 @@ class userController {
                         attributes: [
                             "recipeId", "recipeName", "date", "numberOfLikes", "image", "status",
                             [sequelize.literal(`(SELECT CASE WHEN EXISTS 
-                                (SELECT * FROM "Favorite" WHERE "recipeId" = "Recipes"."recipeId" and "userId" = ${userId}) 
+                                (SELECT * FROM "Favorite" WHERE "recipeId" = "Recipes"."recipeId" and "userId" = ${id}) 
                                 THEN True ELSE False end isFavorite) `), "isFavorite"]
                         ],
                         order: [['date', 'DESC']],
@@ -50,7 +50,7 @@ class userController {
                 attributes: {
                     exclude: ["dateUpdatedRecipe", "createdAt", "updatedAt"], 
                     include: [[sequelize.literal(` (SELECT CASE WHEN EXISTS 
-                        (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${userId}) 
+                        (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${id}) 
                         then True else False end isFollow) `), "isFollow"]]
                 },
             })
@@ -74,6 +74,44 @@ class userController {
                     success: true, 
                     message: "Successfully get data", 
                     data: newData
+                })
+                return
+            }
+            res.status(426).json({
+                success: false, 
+                message: 'User not found',
+                data: ""
+            })
+
+        } catch (error) {
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: ""
+            })
+        }
+    }
+
+    getUserById1 = async (req, res) => {
+        try {
+            let { id } = req.params
+            let user = await db.User.findByPk(id, {
+                attributes: {
+                    exclude: ["dateUpdatedRecipe", "createdAt", "updatedAt"], 
+                    include: [[sequelize.literal(` (SELECT CASE WHEN EXISTS 
+                        (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${id}) 
+                        then True else False end isFollow) `), "isFollow"],
+                        [sequelize.literal(` (Select count(*) from "Recipe" where "userId" = ${id}) `), "countRecipe"],
+                        [sequelize.literal(` (Select count(*) from "Follow" where "userIdFollow" = ${id}) `), "countFollowing"],
+                        [sequelize.literal(` (Select count(*) from "Follow" where "userIdFollowed" = ${id}) `), "countFollowed"]
+                    ]
+                },
+            })
+            if(user) {
+                res.status(200).json({
+                    success: true, 
+                    message: "Successfully get data", 
+                    data: user
                 })
                 return
             }

@@ -935,7 +935,7 @@ class recipeController {
 
     getRecipeByUserId = async (req, res) => {
         try {
-            const userId = req.userId
+            const userId = req.params.userId
             const recipe = await db.Recipe.findAll({
                 where: {
                     userId: userId
