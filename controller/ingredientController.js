@@ -58,7 +58,7 @@ class ingredientController {
                         include: [{
                             model: db.Month,
                             where: {
-                                monthId: 3,
+                                monthId: month,
                             },
                             attributes: []
                         }],

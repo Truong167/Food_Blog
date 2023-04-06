@@ -10,7 +10,15 @@ class followController {
         try {
             let { userIdFollowed } = req.params
             let user = await db.User.findByPk(userIdFollowed)
-            if(user) {
+            let check = await db.Follow.findOne({where: {userIdFollowed: userIdFollowed, userIdFollow: req.userId}})
+            if(check) {
+                res.status(446).json({
+                    success: false,
+                    message: `User has followed this user`,
+                    data: ''
+                })
+            }
+            else if(user) {
                 let follow = await db.Follow.create({
                     userIdFollow: req.userId,
                     userIdFollowed: userIdFollowed,
@@ -21,13 +29,13 @@ class followController {
                     message: 'Successfully',
                     data: follow
                 })
-                return
+            } else {
+                res.status(426).json({
+                    success: false, 
+                    message: 'User not found',
+                    data: ""
+                })
             }
-            res.status(426).json({
-                success: false, 
-                message: 'User not found',
-                data: ""
-            })
         } catch (error) {
             res.status(500).json({
                 success: false, 
