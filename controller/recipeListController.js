@@ -288,13 +288,11 @@ class recipeListController {
     handleCreateRecipe1 = async (req, res) => {
         try {
             let { recipeId } = req.params
-            let {data} = req.body
-            data = JSON.parse(data)
-            let recipeListDetail = data.recipeListDetail
-            console.log(recipeListDetail)
+            let {recipeListDetail} = req.body
+            console.log(req.body)
+            console.log('recipe List', recipeListDetail)
             let recipe = await db.Recipe.findByPk(recipeId)
             let dtList = await db.DetailList.findAll({where: { recipeId: recipeId }})
-            // let recipeListDetail = [{recipeListId: 53}, {recipeListId: 66}]
             console.log(dtList)
             dtList = dtList.filter(({recipeListId: id1}) => !recipeListDetail.some(({recipeListId: id2}) => id2 === id1))
             dtList = dtList.map(item => {
