@@ -1,6 +1,8 @@
 const {sequelize} = require('../models/index')
 const db = require('../models/index')
 const multerConfig = require('../middlewares/utils/multerConfig')
+const Sequelize = require('sequelize')
+const { Op } = Sequelize
 const fs = require('fs')
 
 
@@ -278,6 +280,76 @@ class recipeListController {
             res.status(500).json({
                 success: false, 
                 message: error,
+                data: ""
+            })
+        }
+    }
+    
+    handleCreateRecipe1 = async (req, res) => {
+        try {
+            let { recipeId } = req.params
+            let {data} = req.body
+            data = JSON.parse(data)
+            let recipeListDetail = data.recipeListDetail
+            console.log(recipeListDetail)
+            let recipe = await db.Recipe.findByPk(recipeId)
+            let dtList = await db.DetailList.findAll({where: { recipeId: recipeId }})
+            // let recipeListDetail = [{recipeListId: 53}, {recipeListId: 66}]
+            console.log(dtList)
+            dtList = dtList.filter(({recipeListId: id1}) => !recipeListDetail.some(({recipeListId: id2}) => id2 === id1))
+            dtList = dtList.map(item => {
+                return item.dataValues.recipeListId
+            })
+            recipeListDetail = recipeListDetail.map(item => {
+                item.recipeId = recipeId
+                item.date = Date.now()
+                return item
+            })
+            if(!recipe) {
+                res.status(432).json({
+                    success: false,
+                    message: 'Recipe not found',
+                    data: ""
+                })
+            } else {
+                const updateRecipe = await sequelize.transaction(async t => {
+                    if(dtList.length > 0) {
+                        await db.DetailList.destroy({
+                            where: {
+                                [Op.and]: [
+                                    {
+                                        recipeListId: {
+                                            [Op.or]: dtList
+                                        }
+                                    },
+                                    {
+                                        recipeId: recipeId
+                                    }
+                                ]
+                                
+                            },
+                        }, {transaction: t})
+                        await db.DetailList.bulkCreate(recipeListDetail, {
+                            updateOnDuplicate: ["recipeListId", "recipeId"],
+                        } ,{transaction: t})
+                    } else {
+                        await db.DetailList.bulkCreate(recipeListDetail, {
+                            updateOnDuplicate: ["recipeListId", "recipeId"],
+                        } ,{transaction: t})
+                    }
+
+                    res.status(200).json({
+                        success: true, 
+                        message: 'Recipe created successfully',
+                        data: ''
+                    })
+                })
+            }
+
+        } catch (error) {
+            res.status(500).json({
+                success: false, 
+                message: error.message,
                 data: ""
             })
         }
