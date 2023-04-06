@@ -935,10 +935,74 @@ class recipeController {
 
     getRecipeByUserId = async (req, res) => {
         try {
-            const userId = req.params.userId
+            const userId = req.userId
             const recipe = await db.Recipe.findAll({
                 where: {
                     userId: userId
+                },
+                order: [["date", "DESC"]],
+                attributes: [
+                    "recipeId", "recipeName", "date", "numberOfLikes", "image", "status",
+                    [sequelize.literal(`(SELECT CASE WHEN EXISTS 
+                        (SELECT * FROM "Favorite" WHERE "recipeId" = "Recipe"."recipeId" and "userId" = ${userId}) 
+                        THEN True ELSE False end isFavorite) `), "isFavorite"]
+                ], 
+                include: [
+                    {
+                        model: db.DetailList,
+                        include: {
+                            model: db.RecipeList,
+                            attributes: ["name"]
+                        },
+                        attributes: ["recipeListId"]
+                    }, 
+                ]
+            })
+            const user = await db.User.findByPk(userId)
+            if(recipe && recipe.length > 0) {
+                recipe.map(item => {
+                    item.dataValues.DetailLists.map(item => {
+                        item.dataValues.name = item.dataValues.RecipeList.dataValues.name
+                        delete item.dataValues['RecipeList']
+                        return item
+                    })
+                })
+                const newData = {user, recipe}
+                res.status(200).json({
+                    success: true,
+                    message: "Successfully get data",
+                    data: recipe
+                })
+                return
+            }
+
+            res.status(432).json({
+                success: true,
+                message: "Recipe not found",
+                data: recipe
+            })
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: error,
+                data: ""
+            })
+        }
+    }
+
+    getRecipeByUserId1 = async (req, res) => {
+        try {
+            const userId = req.params.userId
+            const recipe = await db.Recipe.findAll({
+                where: {
+                    [Op.and]: [
+                        {
+                            userId: userId
+                        },
+                        {
+                            status: 'CK'
+                        }
+                    ]
                 },
                 order: [["date", "DESC"]],
                 attributes: [
