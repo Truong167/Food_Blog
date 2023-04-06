@@ -231,7 +231,7 @@ class userController {
                         }
                     },
                     attributes: [
-                        "userId", "fullName", "avatar",
+                        "userId", "fullName", "avatar", "email",
                         [sequelize.literal(` (SELECT CASE WHEN EXISTS 
                             (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${userId1}) 
                             then True else False end isFollow) `), "isFollow"]
@@ -283,7 +283,7 @@ class userController {
                         }
                     },
                     attributes: [
-                        "userId", "fullName", "avatar",
+                        "userId", "fullName", "avatar", "email",
                         [sequelize.literal(` (SELECT CASE WHEN EXISTS 
                             (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${userId1}) 
                             then True else False end isFollow) `), "isFollow"]
