@@ -142,21 +142,7 @@ class recipeListController {
     }
 
     handleUpdateRecipeList = async (req, res) => {
-        let uploadFile = multerConfig().fields([
-            {
-                name: 'recipeList',
-                maxCount: 2
-            }
-        ]) 
-        uploadFile(req, res, async (error) => {
-            if(error) {
-                return res.status(440).json({
-                    success: false, 
-                    message: `Error when trying to upload: ${error}`,
-                    data: ""
-                })
-            }
-            let { name } = req.body
+        let { name } = req.body
             if(!name) {
                 res.status(418).json({
                     success: false,
@@ -168,16 +154,9 @@ class recipeListController {
             try {
                 let { id } = req.params
                 let recipeList = await db.RecipeList.findByPk(id)
-                let oldImage = recipeList.image
                 if(recipeList) {
                     recipeList.name = name
-                    recipeList.image = req.files.recipeList ? `/recipeList/${req.files.recipeList[0].filename}` : oldImage
                     await recipeList.save()
-                    if(req.files.recipeList && oldImage !== null){
-                        fs.unlink(`public/image${oldImage}`, error => {
-                            if(error) throw error
-                        })
-                    }
                     res.status(200).json({
                         success: true,
                         message: 'Successfully updated recipe list',
@@ -198,7 +177,6 @@ class recipeListController {
                     data: ""
                 })
             }
-        })
     }
 
     handleDeleteRecipeList = async (req, res) => {
