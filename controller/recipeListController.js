@@ -289,11 +289,10 @@ class recipeListController {
         try {
             let { recipeId } = req.params
             let {recipeListDetail} = req.body
-            console.log(req.body)
-            console.log('recipe List', recipeListDetail)
             let recipe = await db.Recipe.findByPk(recipeId)
             let dtList = await db.DetailList.findAll({where: { recipeId: recipeId }})
-            console.log(dtList)
+
+            // Lọc những phần tử trong mảng dtList kh trùng với những phần từ trong recipeListDetail
             dtList = dtList.filter(({recipeListId: id1}) => !recipeListDetail.some(({recipeListId: id2}) => id2 === id1))
             dtList = dtList.map(item => {
                 return item.dataValues.recipeListId
@@ -384,22 +383,55 @@ class recipeListController {
 
     getRecipe = async (req, res) => {
         try {
+            let {userId} = req
             let {recipeListId} = req.params
-            let recipe = await db.DetailList.findAll({
+            let dt = await db.DetailList.findAll({
                 where: {
                     recipeListId: recipeListId
-                },
-                include: [
-                    {
-                        model: db.Recipe,
-                        include: {model: db.User},
-                        required: true
-                    }
-                ],
+                }
             })
 
+            dt = dt.map(item => {
+                return item.dataValues.recipeId
+            })
+            console.log(dt)
+            let recipe = await db.Recipe.findAll({
+                where: {
+                    recipeId: {
+                        [Op.or]: dt
+                    }
+                },     
+                include: [
+                    {
+                        model: db.User,
+                        attributes: [
+                            "fullName", "avatar", "userId",
+                            [sequelize.literal(` (SELECT CASE WHEN EXISTS 
+                                (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${userId}) 
+                                then True else False end isFollow) `), "isFollow"]
+                        ]
+                    },
+                    // {
+                    //     model: db.DetailList,
+                    //     include: {
+                    //         model: db.RecipeList,
+                    //         attributes: ["name"]
+                    //     },
+                    //     attributes: ["recipeListId"]
+                    // }, 
+                ]
+                ,
+                attributes: [
+                    "recipeId", "recipeName", "date", "numberOfLikes", "image", "status",
+                    [sequelize.literal(`(SELECT CASE WHEN EXISTS 
+                        (SELECT * FROM "Favorite" WHERE "recipeId" = "Recipe"."recipeId" and "userId" = ${userId}) 
+                        THEN True ELSE False end isFavorite) `), "isFavorite"]
+                ],
+                order: [["date", 'DESC']]
+            })
+
+
             if(recipe && recipe.length > 0){
-                recipe.isLike = true
                 res.status(200).json({
                     success: true,
                     message: 'Successfully get data',
