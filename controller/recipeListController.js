@@ -385,6 +385,7 @@ class recipeListController {
         try {
             let {userId} = req
             let {recipeListId} = req.params
+            console.log(recipeListId)
             let dt = await db.DetailList.findAll({
                 where: {
                     recipeListId: recipeListId
@@ -394,6 +395,14 @@ class recipeListController {
             dt = dt.map(item => {
                 return item.dataValues.recipeId
             })
+            if(dt.length == 0){
+                res.status(447).json({
+                    success: false, 
+                    message: "Don't have recipe in this reipce list",
+                    data: ""
+                })
+                return
+            }
             let recipe = await db.Recipe.findAll({
                 where: {
                     [Op.and]: [
