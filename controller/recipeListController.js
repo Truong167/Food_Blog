@@ -394,12 +394,18 @@ class recipeListController {
             dt = dt.map(item => {
                 return item.dataValues.recipeId
             })
-            console.log(dt)
             let recipe = await db.Recipe.findAll({
                 where: {
-                    recipeId: {
-                        [Op.or]: dt
-                    }
+                    [Op.and]: [
+                        {
+                            recipeId: {
+                                [Op.or]: dt
+                            }
+                        },
+                        {
+                            status: 'CK'
+                        }
+                    ]
                 },     
                 include: [
                     {
