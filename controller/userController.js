@@ -314,13 +314,19 @@ class userController {
     searchUserByName = async (req, res) => {
         try {
             const {q} = req.query
+            const {userId} = req
             let user = await db.User.findAll({
                 where: {
                     fullName: {
                         [Op.iLike]: `%${q}%`
                     }
                 },
-                attributes: ["fullName", "userId"]
+                attributes: [
+                    "userId", "fullName", "avatar", "email",
+                    [sequelize.literal(` (SELECT CASE WHEN EXISTS 
+                        (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${userId}) 
+                        then True else False end isFollow) `), "isFollow"]
+                ]
             })
 
             if(user && user.length > 0){
@@ -349,13 +355,19 @@ class userController {
     searchUserByEmail = async (req, res) => {
         try {
             const {q} = req.query
+            const {userId} = req
             let user = await db.User.findAll({
                 where: {
                     email: {
                         [Op.iLike]: `%${q}%`
                     }
                 },
-                attributes: ["fullName", "userId", "email"]
+                attributes: [
+                    "userId", "fullName", "avatar", "email",
+                    [sequelize.literal(` (SELECT CASE WHEN EXISTS 
+                        (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${userId}) 
+                        then True else False end isFollow) `), "isFollow"]
+                ]
             })
 
             if(user && user.length > 0){
