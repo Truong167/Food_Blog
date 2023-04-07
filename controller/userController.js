@@ -310,6 +310,76 @@ class userController {
             })
         }
     } 
+
+    searchUserByName = async (req, res) => {
+        try {
+            const {q} = req.query
+            let user = await db.User.findAll({
+                where: {
+                    fullName: {
+                        [Op.iLike]: `%${q}%`
+                    }
+                },
+                attributes: ["fullName", "userId"]
+            })
+
+            if(user && user.length > 0){
+                res.status(200).json({
+                    success: true,
+                    message: 'Successfully search',
+                    data: user
+                })
+                return
+            }
+
+            res.status(426).json({
+                success: false, 
+                message: 'User not found',
+                data: ""
+            })
+        } catch (error) {
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: ""
+            })
+        }
+    }
+
+    searchUserByEmail = async (req, res) => {
+        try {
+            const {q} = req.query
+            let user = await db.User.findAll({
+                where: {
+                    email: {
+                        [Op.iLike]: `%${q}%`
+                    }
+                },
+                attributes: ["fullName", "userId", "email"]
+            })
+
+            if(user && user.length > 0){
+                res.status(200).json({
+                    success: true,
+                    message: 'Successfully search',
+                    data: user
+                })
+                return
+            }
+
+            res.status(426).json({
+                success: false, 
+                message: 'User not found',
+                data: ""
+            })
+        } catch (error) {
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: ""
+            })
+        }
+    }
 }
 
 module.exports = new userController

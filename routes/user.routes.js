@@ -12,6 +12,9 @@ router.get('/getUser1/:id', userController.getUserById1)
 
 router.get('/getUserFollowing/:userId', userController.getUserFollowing)
 router.get('/getUserFollow/:userId', userController.getUserFollow)
+router.get('/searchUserByName', userController.searchUserByName)
+router.get('/searchUserByEmail', userController.searchUserByEmail)
+
 
 router.put('/update', userController.handleUpdateUser)
 
