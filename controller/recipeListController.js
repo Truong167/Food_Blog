@@ -426,8 +426,7 @@ class recipeListController {
                     [sequelize.literal(`(SELECT CASE WHEN EXISTS 
                         (SELECT * FROM "Favorite" WHERE "recipeId" = "Recipe"."recipeId" and "userId" = ${userId}) 
                         THEN True ELSE False end isFavorite) `), "isFavorite"]
-                ],
-                order: [["date", 'DESC']]
+                ]
             })
 
 
@@ -440,7 +439,7 @@ class recipeListController {
                 return
             }
             res.status(432).json({
-                success: true, 
+                success: false, 
                 message: 'Recipe list not found',
                 data: ""
             })
