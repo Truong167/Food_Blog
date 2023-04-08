@@ -407,14 +407,29 @@ class recipeController {
                             } ,{transaction: t})
                         }
                         if(ingredient.length > 0) {
-                            await db.DetailIngredient.destroy({where: {
-                                ingredientId: {
-                                    [Op.or]: ingredient
-                                }
-                            }}, {transaction: t})
-                            await db.DetailIngredient.bulkCreate(DetailIngredients, {transaction: t})
+                            await db.DetailIngredient.destroy(
+                                {
+                                    where: {
+                                        [Op.and]: [
+                                            {
+                                                ingredientId: {
+                                                    [Op.or]: ingredient
+                                                }
+                                            },
+                                            {
+                                                recipeId: recipeId
+                                            }
+                                        ]
+                                        
+                                    },
+                                }, {transaction: t})
+                            await db.DetailIngredient.bulkCreate(DetailIngredients, {
+                                updateOnDuplicate: ["ingredientId", "recipeId", "amount"]
+                            }, {transaction: t})
                         } else {
-                            await db.DetailIngredient.bulkCreate(DetailIngredients, {transaction: t})
+                            await db.DetailIngredient.bulkCreate(DetailIngredients, {
+                                updateOnDuplicate: ["ingredientId", "recipeId", "amount"]
+                            }, {transaction: t})
                         }
                         recipe.recipeName = data.recipeName
                         recipe.amount = data.amount
