@@ -382,6 +382,14 @@ class recipeController {
                                 // Steps[i].image = null
                             }
                         }
+                Steps = Steps.map(item => {
+                    item.recipeId = recipeId
+                    return item
+                })
+                DetailIngredients = DetailIngredients.map(item => {
+                    item.recipeId = recipeId
+                    return item
+                })
                 console.log("Steps: ", Steps)
                 console.log("DetailIngredients: ", DetailIngredients)
                 if(recipe) {
@@ -393,11 +401,11 @@ class recipeController {
                                 }
                             }}, {transaction: t})
                             await db.Step.bulkCreate(Steps, {
-                                updateOnDuplicate: ["stepId", "stepIndex", "description"],
+                                updateOnDuplicate: ["stepId", "stepIndex", "description", "recipeId"],
                             } ,{transaction: t})
                         } else {
                             await db.Step.bulkCreate(Steps, {
-                                updateOnDuplicate: ["stepId", "stepIndex", "description"],
+                                updateOnDuplicate: ["stepId", "stepIndex", "description", "recipeId"],
                             } ,{transaction: t})
                         }
                         if(ingredient.length > 0) {
