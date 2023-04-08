@@ -381,17 +381,14 @@ class recipeController {
                             } else {
                                 // Steps[i].image = null
                             }
+                            Steps[i].recipeId = recipe.recipeId
                         }
-                Steps = Steps.map(item => {
-                    item.recipeId = recipeId
-                    return item
-                })
                 DetailIngredients = DetailIngredients.map(item => {
                     item.recipeId = recipeId
                     return item
                 })
-                console.log("Steps: ", Steps)
-                console.log("DetailIngredients: ", DetailIngredients)
+                console.log("Steps1: ", Steps)
+                console.log("DetailIngredients1: ", DetailIngredients)
                 if(recipe) {
                     const updateRecipe = await sequelize.transaction(async t => {
                         if(step.length > 0) {
