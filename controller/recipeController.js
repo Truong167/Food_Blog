@@ -376,12 +376,14 @@ class recipeController {
                 let index = 0
                         for(let i = 0; i < Steps.length; i++){
                             if(Steps[i].image != "") {
-                                Steps[i].image = `/step/${req.files.step[index].filename}`
+                                Steps[i].image = req.files.step && req.files.step[index] ? `/step/${req.files.step[index].filename}` : Steps[i].image
                                 index++
                             } else {
                                 // Steps[i].image = null
                             }
                         }
+                console.log("Steps: ", Steps)
+                console.log("DetailIngredients: ", DetailIngredients)
                 if(recipe) {
                     const updateRecipe = await sequelize.transaction(async t => {
                         if(step.length > 0) {
