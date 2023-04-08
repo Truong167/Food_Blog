@@ -389,6 +389,7 @@ class recipeController {
                 })
                 console.log("Steps1: ", Steps)
                 console.log("DetailIngredients1: ", DetailIngredients)
+                console.log(data.recipeName, data.amount, data.preparationTime, data.cookingTime, data.status, data.description)
                 if(recipe) {
                     const updateRecipe = await sequelize.transaction(async t => {
                         if(step.length > 0) {
@@ -443,7 +444,7 @@ class recipeController {
             } catch (error) {
                 res.status(500).json({
                     success: false, 
-                    message: error.message,
+                    message: error,
                     data: ""
                 })
             }
