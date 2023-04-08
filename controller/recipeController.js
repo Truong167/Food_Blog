@@ -357,7 +357,8 @@ class recipeController {
             try {
                 let { data } = req.body
                 let recipeId  = req.params.id
-    
+                console.log(req.body)
+                console.log(data)
                 let recipe = await db.Recipe.findByPk(recipeId)
                 let ingredient = await db.DetailIngredient.findAll({where: {recipeId: recipeId}})
                 let step = await db.Step.findAll({where: {recipeId: recipeId}})
