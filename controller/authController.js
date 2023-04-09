@@ -155,8 +155,110 @@ class authController {
     }
 
     handleChangePassword = async (req, res) => {
+        let {accountName, newPassword, checkPassword, otp} = req.body
+        try {
+            const currentTime = new Date()
+            let account = await db.Account.findByPk(accountName)
+            if (!checkOtp) 
+                return res.status(449).json({
+                    success: false,
+                    message: 'Invalid OTP',
+                    data: ""
+                })
+            if (!bcrypt.compareSync(otp, checkOtp.value)) 
+                return res.status(450).json({
+                    success: false,
+                    message: 'Incorrect OTP',
+                    data: ""
+                })
+            const expireTime = new Date(checkOtp.duration)
+            if (currentTime.getTime() > expireTime.getTime()) 
+                return res.status(451).json({
+                    success: false,
+                    message: 'OTP expired',
+                    data: ""
+                })
+            if(!account){
+                return res.status(424).json({
+                    success: false,
+                    message: 'Account does not exist',
+                    data: ""
+                })
+            }
+            if(!validatePassword(newPassword)){
+                return res.status(420).json({
+                    success: false,
+                    message:
+                      'Your password must be at least 6 characters long and contain a lowercase letter, an uppercase letter, a numeric digit and a special character.',
+                    data: ""
+                  })
+            }
+            if( newPassword != checkPassword){
+                return res.status(419).json({
+                    success: false,
+                    message: 'The entered passwords do not match',
+                    data: ""
+                })
+            }
+
+            let user = await db.User.findByPk(account.userId)
+            let checkOtp = await db.Otp.findByPk(user.email)
+
+            account.password = bcrypt.hashSync(newPassword, 10)
+            await account.save()
+            res.status(200).json({
+                success: true,
+                message: 'Successfully change password',
+                data: ''
+            })
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: error.message,
+                data: ""
+            })
+        }
+    }
+
+    sendOtp = async (req, res) => {
+        try {
+            const { accountName, subject } = req.body
+            let account = await db.Account.findByPk(accountName)
+            let user = await db.User.findByPk(account.userId)
+            let expire = new Date()
+            expire.setMinutes(expire.getMinutes() + 2)
+            const otpGenerator = OtpGenerator.generate(6, {
+                digits: true,
+                lowerCaseAlphabets: false,
+                upperCaseAlphabets: false,
+                specialChars: false,
+            })
+            let data = [{
+                email: user.email,
+                value: bcrypt.hashSync(otpGenerator, 10),
+                duration: expire
+            }]
+            let otp = await db.Otp.bulkCreate(data, {updateOnDuplicate: ["email", "value", "duration"]})
+            // Thực hiện gửi email
+            await mailer.sendMail(user.email, subject, otpGenerator)
+            // Quá trình gửi email thành công thì gửi về thông báo success cho người dùng
+            res.status(200).json({
+                success: true,
+                message: 'Successfully send otp',
+                data: otp
+            })
+          } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: error,
+                data: ""
+            })
+          }
+    }
+
+    forgotPassword = async (req, res) => {
         let {userId} = req
-        let {currentPassword, newPassword, checkPassword, otp} = req.body
+        let {newPassword, checkPassword, otp} = req.body
         try {
             const currentTime = new Date()
             let account = await db.Account.findOne({
@@ -232,40 +334,6 @@ class authController {
                 data: ""
             })
         }
-    }
-
-    sendOtp = async (req, res) => {
-        try {
-            const { to, subject } = req.body
-            let expire = new Date()
-            expire.setMinutes(expire.getMinutes() + 2)
-            const otpGenerator = OtpGenerator.generate(6, {
-                digits: true,
-                lowerCaseAlphabets: false,
-                upperCaseAlphabets: false,
-                specialChars: false,
-            })
-            let data = [{
-                email: to,
-                value: bcrypt.hashSync(otpGenerator, 10),
-                duration: expire
-            }]
-            let otp = await db.Otp.bulkCreate(data, {updateOnDuplicate: ["email", "value", "duration"]})
-            // Thực hiện gửi email
-            await mailer.sendMail(to, subject, otpGenerator)
-            // Quá trình gửi email thành công thì gửi về thông báo success cho người dùng
-            res.status(200).json({
-                success: true,
-                message: 'Successfully send otp',
-                data: otp
-            })
-          } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: error.message,
-                data: ""
-            })
-          }
     }
 }
 
