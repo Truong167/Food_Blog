@@ -374,7 +374,7 @@ class recipeController {
                     return item.dataValues.ingredientId
                 })
                 let index = 0
-                console.log(req.files)
+                console.log(req.files.step)
                 for(let i = 0; i < Steps.length; i++){
                     if(Steps[i].image != "") {
                         Steps[i].image = `/step/${req.files.step[index].filename}`
