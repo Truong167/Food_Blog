@@ -376,11 +376,12 @@ class recipeController {
                 let index = 0
                 console.log(req.files.step)
                 for(let i = 0; i < Steps.length; i++){
-                    if(Steps[i].image != "") {
+
+                    if(Steps[i].imageFile) {
                         Steps[i].image = `/step/${req.files.step[index].filename}`
                         index++
                     } else {
-                        Steps[i].image = null
+                        Steps[i].image = Steps[i].image
                     }
                     Steps[i].recipeId = recipe.recipeId
                 }
