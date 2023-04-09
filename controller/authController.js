@@ -159,12 +159,16 @@ class authController {
         try {
             const currentTime = new Date()
             let account = await db.Account.findByPk(accountName)
-            if (!checkOtp) 
-                return res.status(449).json({
+
+            if(!account){
+                return res.status(424).json({
                     success: false,
-                    message: 'Invalid OTP',
+                    message: 'Account does not exist',
                     data: ""
                 })
+            }
+            let user = await db.User.findByPk(account.userId)
+            let checkOtp = await db.Otp.findByPk(user.email)
             if (!bcrypt.compareSync(otp, checkOtp.value)) 
                 return res.status(450).json({
                     success: false,
@@ -178,13 +182,6 @@ class authController {
                     message: 'OTP expired',
                     data: ""
                 })
-            if(!account){
-                return res.status(424).json({
-                    success: false,
-                    message: 'Account does not exist',
-                    data: ""
-                })
-            }
             if(!validatePassword(newPassword)){
                 return res.status(420).json({
                     success: false,
@@ -201,8 +198,6 @@ class authController {
                 })
             }
 
-            let user = await db.User.findByPk(account.userId)
-            let checkOtp = await db.Otp.findByPk(user.email)
 
             account.password = bcrypt.hashSync(newPassword, 10)
             await account.save()
