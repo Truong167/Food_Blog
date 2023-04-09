@@ -3,36 +3,28 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Account extends Model {
+  class Otp extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // Account.hasOne(models.User)
-      // define association here
-      // Account.belongsTo(models.User, {
-      //   foreignKey: 'userId',
-      //   as: 'userData',
-      //   onDelete: 'CASCADE',
-      //   onUpdate: 'CASCADE'
-      // });
+
     }
   }
-  Account.init({
-    accountName: {
+  Otp.init({
+    email: {
       type: DataTypes.STRING,
       primaryKey: true,
     },
-    password: DataTypes.STRING,
-    userId: DataTypes.INTEGER,
-    
+    value: DataTypes.STRING,
+    duration: DataTypes.DATE,
   }, {
     sequelize,
     freezeTableName: true,
-    modelName: 'Account',
+    modelName: 'Otp',
   });
   
-  return Account;
+  return Otp;
 };

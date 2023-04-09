@@ -380,9 +380,10 @@ class recipeController {
                     if(Steps[i].imageFile) {
                         Steps[i].image = `/step/${req.files.step[index].filename}`
                         index++
-                    } else {
-                        Steps[i].image = Steps[i].image
-                    }
+                    } 
+                    // else {
+                    //     Steps[i].image = Steps[i].image
+                    // }
                     Steps[i].recipeId = recipe.recipeId
                 }
                 DetailIngredients = DetailIngredients.map(item => {

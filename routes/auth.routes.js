@@ -10,6 +10,7 @@ const verifyToken = require('../middlewares/auth')
 
 router.get('/', verifyToken, authController.handleCheckLogin)
 router.put('/changePassword', verifyToken, authController.handleChangePassword)
+router.post('/sendOtp', authController.sendOtp)
 router.post('/register', authController.handleRegister)
 router.post('/login', authController.handleLogin)
 

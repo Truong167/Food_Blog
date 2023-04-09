@@ -8,6 +8,8 @@ const {
 } = require('../middlewares/validator')
 const {sequelize} = require('../models/index')
 const jwt = require('jsonwebtoken')
+const mailer = require('../middlewares/utils/mailer')
+const OtpGenerator = require('otp-generator')
 require('dotenv').config()
 
 class authController {
@@ -154,13 +156,37 @@ class authController {
 
     handleChangePassword = async (req, res) => {
         let {userId} = req
-        let {currentPassword, newPassword, checkPassword} = req.body
+        let {currentPassword, newPassword, checkPassword, otp} = req.body
         try {
+            const currentTime = new Date()
             let account = await db.Account.findOne({
                 where: {
                     userId: userId
-                }
+                }, 
             })
+            let user = await db.User.findByPk(userId)
+            let checkOtp = await db.Otp.findByPk(user.email)
+
+            if (!checkOtp) 
+                return res.status(449).json({
+                    success: false,
+                    message: 'Invalid OTP',
+                    data: ""
+                })
+            if (!bcrypt.compareSync(otp, checkOtp.value)) 
+                return res.status(450).json({
+                    success: false,
+                    message: 'Incorrect OTP',
+                    data: ""
+                })
+            const expireTime = new Date(checkOtp.duration)
+            console.log(expireTime.getTime());
+            if (currentTime.getTime() > expireTime.getTime()) 
+                return res.status(451).json({
+                    success: false,
+                    message: 'OTP expired',
+                    data: ""
+                })
             if(!account){
                 return res.status(424).json({
                     success: false,
@@ -206,6 +232,40 @@ class authController {
                 data: ""
             })
         }
+    }
+
+    sendOtp = async (req, res) => {
+        try {
+            const { to, subject } = req.body
+            let expire = new Date()
+            expire.setMinutes(expire.getMinutes() + 2)
+            const otpGenerator = OtpGenerator.generate(6, {
+                digits: true,
+                lowerCaseAlphabets: false,
+                upperCaseAlphabets: false,
+                specialChars: false,
+            })
+            let data = [{
+                email: to,
+                value: bcrypt.hashSync(otpGenerator, 10),
+                duration: expire
+            }]
+            let otp = await db.Otp.bulkCreate(data, {updateOnDuplicate: ["email", "value", "duration"]})
+            // Thực hiện gửi email
+            await mailer.sendMail(to, subject, otpGenerator)
+            // Quá trình gửi email thành công thì gửi về thông báo success cho người dùng
+            res.status(200).json({
+                success: true,
+                message: 'Successfully send otp',
+                data: otp
+            })
+          } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: error.message,
+                data: ""
+            })
+          }
     }
 }
 
