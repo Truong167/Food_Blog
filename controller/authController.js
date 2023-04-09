@@ -151,6 +151,62 @@ class authController {
             })
         }
     }
+
+    handleChangePassword = async (req, res) => {
+        let {userId} = req
+        let {currentPassword, newPassword, checkPassword} = req.body
+        try {
+            let account = await db.Account.findOne({
+                where: {
+                    userId: userId
+                }
+            })
+            if(!account){
+                return res.status(424).json({
+                    success: false,
+                    message: 'Account does not exist',
+                    data: ""
+                })
+            }
+            const pass = await bcrypt.compare(currentPassword, account.password)
+            if(!pass){
+                return  res.status(425).json({
+                    success: false,
+                    message: 'Password do not match',
+                    data: ""
+                })
+            }
+            if(!validatePassword(newPassword)){
+                return res.status(420).json({
+                    success: false,
+                    message:
+                      'Your password must be at least 6 characters long and contain a lowercase letter, an uppercase letter, a numeric digit and a special character.',
+                    data: ""
+                  })
+            }
+            if( newPassword != checkPassword){
+                return res.status(419).json({
+                    success: false,
+                    message: 'The entered passwords do not match',
+                    data: ""
+                })
+            }
+
+            account.password = bcrypt.hashSync(newPassword, 10)
+            await account.save()
+            res.status(200).json({
+                success: true,
+                message: 'Successfully change password',
+                data: ''
+            })
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: error.message,
+                data: ""
+            })
+        }
+    }
 }
 
 module.exports = new authController

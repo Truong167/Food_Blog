@@ -374,15 +374,15 @@ class recipeController {
                     return item.dataValues.ingredientId
                 })
                 let index = 0
-                        for(let i = 0; i < Steps.length; i++){
-                            if(Steps[i].image != "") {
-                                Steps[i].image = req.files.step && req.files.step[index] ? `/step/${req.files.step[index].filename}` : Steps[i].image
-                                index++
-                            } else {
-                                // Steps[i].image = null
-                            }
-                            Steps[i].recipeId = recipe.recipeId
-                        }
+                for(let i = 0; i < Steps.length; i++){
+                    if(Steps[i].image != "") {
+                        Steps[i].image = `/step/${req.files.step[index].filename}`
+                        index++
+                    } else {
+                        Steps[i].image = null
+                    }
+                    Steps[i].recipeId = recipe.recipeId
+                }
                 DetailIngredients = DetailIngredients.map(item => {
                     item.recipeId = recipeId
                     return item
