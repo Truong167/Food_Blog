@@ -389,8 +389,6 @@ class recipeController {
                     return item
                 })
                 console.log("Steps1: ", Steps)
-                console.log("DetailIngredients1: ", DetailIngredients)
-                console.log(data.recipeName, data.amount, data.preparationTime, data.cookingTime, data.status, data.description)
                 if(recipe) {
                     const updateRecipe = await sequelize.transaction(async t => {
                         if(step.length > 0) {
@@ -400,11 +398,11 @@ class recipeController {
                                 }
                             }}, {transaction: t})
                             await db.Step.bulkCreate(Steps, {
-                                updateOnDuplicate: ["stepId", "stepIndex", "description", "recipeId"],
+                                updateOnDuplicate: ["stepId", "stepIndex", "description", "recipeId", "image"],
                             } ,{transaction: t})
                         } else {
                             await db.Step.bulkCreate(Steps, {
-                                updateOnDuplicate: ["stepId", "stepIndex", "description", "recipeId"],
+                                updateOnDuplicate: ["stepId", "stepIndex", "description", "recipeId", "image"],
                             } ,{transaction: t})
                         }
                         if(ingredient.length > 0) {
