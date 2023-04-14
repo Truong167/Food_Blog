@@ -219,7 +219,7 @@ class recipeController {
         )
         uploadFile( req, res, async (error) => {
             console.log(req.body)
-            let { recipeName, amount, status, prepareTime, cookingTime, description, DetailIngredients, Steps} = req.body
+            let { recipeName, amount, status, preparationTime, cookingTime, description, DetailIngredients, Steps} = req.body
             if(error) {
                 return res.status(440).json({
                     success: false, 
@@ -245,10 +245,10 @@ class recipeController {
                     })
                     return
                 }
-                else if(!prepareTime){
+                else if(!preparationTime){
                     res.status(418).json({
                         status: false,
-                        message: 'Please provide all required fields: preparationTime',
+                        message: `Please provide all required fields: ${preparationTime}`,
                         data: ""
                     })
                     return
@@ -286,7 +286,7 @@ class recipeController {
                     DetailIngredients = JSON.parse(DetailIngredients)
                     Steps = JSON.parse(Steps)
                     let  userId = req.userId
-                    console.log(req.files)
+                    console.log(req.files.recipe)
                     const result = await sequelize.transaction(async t => {
                         let recipe = await db.Recipe.create({
                             recipeName: recipeName,
@@ -299,20 +299,20 @@ class recipeController {
                             description: description ? description : null,
                             userId: userId
                         }, { transaction: t })
-                        // let ingredientName = [
-                        //     {"ingredientNameId": "thitheo", "amount": "2kg"}
-                        // ]
-                        // let step = [
-                        //     {"stepIndex": 1, "description": "TESSTTT"},
-                        //     {"stepIndex": 2, "description": "TESSTTT"},
-                        //     {"stepIndex": 3, "description": "TESSTTT"}
-                        // ]
                         DetailIngredients = DetailIngredients.map(item => {
                             item.recipeId = recipe.recipeId
                             return item
                         })
+                        console.log(Steps)
+                        console.log(req.files.step)
+                        let index = 0
                         for(let i = 0; i < Steps.length; i++){
-                            Steps[i].image = req.files.step[i] ? `/step/${req.files.step[i].filename}` : null
+                            if(Steps[i].image != "") {
+                                Steps[i].image = `/step/${req.files.step[index].filename}`
+                                index++
+                            } else {
+                                Steps[i].image = null
+                            }
                             Steps[i].recipeId = recipe.recipeId
                         }
                         let ingre = await db.DetailIngredient.bulkCreate(DetailIngredients, { transaction: t })
@@ -609,9 +609,16 @@ class recipeController {
             const {q} = req.query
             let recipe = await db.Recipe.findAll({
                 where: {
-                    recipeName: {
-                        [Op.iLike]: `%${q}%`
-                    }
+                    [Op.and]: [
+                        {
+                            recipeName: {
+                                [Op.iLike]: `%${q}%`
+                            }
+                        },
+                        {
+                            status: 'CK'
+                        }
+                    ]
                 },
                 attributes: ["recipeName"]
             })

@@ -21,6 +21,8 @@ router.get('/getRecipeFavorite', recipeController.getRecipeFavorite)
 
 
 router.post('/createRecipe', recipeController.handleCreateRecipe)
+router.post('/createRecipe1', recipeController.handleCreateRecipe1)
+
 router.put('/updateRecipe/:id', recipeController.handleUpdateRecpipe)
 router.put('/updatePrivacyRecipe/:id', recipeController.updatePrivacyOfRecipe)
 router.delete('/deleteRecipe/:id', recipeController.handleDeleteRecipe)
