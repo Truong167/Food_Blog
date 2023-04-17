@@ -169,19 +169,6 @@ class authController {
             }
             let user = await db.User.findByPk(account.userId)
             let checkOtp = await db.Otp.findByPk(user.email)
-            if (!bcrypt.compareSync(otp, checkOtp.value)) 
-                return res.status(450).json({
-                    success: false,
-                    message: 'Incorrect OTP',
-                    data: ""
-                })
-            const expireTime = new Date(checkOtp.duration)
-            if (currentTime.getTime() > expireTime.getTime()) 
-                return res.status(451).json({
-                    success: false,
-                    message: 'OTP expired',
-                    data: ""
-                })
             if(!validatePassword(newPassword)){
                 return res.status(420).json({
                     success: false,
@@ -197,6 +184,19 @@ class authController {
                     data: ""
                 })
             }
+            if (!bcrypt.compareSync(otp, checkOtp.value)) 
+                return res.status(450).json({
+                    success: false,
+                    message: 'Incorrect OTP',
+                    data: ""
+                })
+            const expireTime = new Date(checkOtp.duration)
+            if (currentTime.getTime() > expireTime.getTime()) 
+                return res.status(451).json({
+                    success: false,
+                    message: 'OTP expired',
+                    data: ""
+                })
 
 
             account.password = bcrypt.hashSync(newPassword, 10)
@@ -219,9 +219,16 @@ class authController {
         try {
             const { accountName, subject } = req.body
             let account = await db.Account.findByPk(accountName)
-            let user = await db.User.findByPk(account.userId)
             let expire = new Date()
             expire.setMinutes(expire.getMinutes() + 2)
+            if(!account){
+                return res.status(424).json({
+                    success: false,
+                    message: 'Account does not exist',
+                    data: ""
+                })
+            }
+            let user = await db.User.findByPk(account.userId)
             const otpGenerator = OtpGenerator.generate(6, {
                 digits: true,
                 lowerCaseAlphabets: false,
@@ -245,7 +252,7 @@ class authController {
           } catch (error) {
             res.status(500).json({
                 success: false,
-                message: error,
+                message: error.message,
                 data: ""
             })
           }

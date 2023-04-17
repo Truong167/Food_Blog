@@ -227,61 +227,68 @@ class recipeController {
                     data: ""
                 });
             }    
-            // if(!recipeName || !amount || !preparationTime || !cookingTime || !status || !DetailIngredients || !Steps) {
+            if(!recipeName || !amount || !preparationTime || !cookingTime || !status || !DetailIngredients || !Steps) {
+                res.status(418).json({
+                    status: false,
+                    message: 'Please provide all required fields',
+                    data: ""
+                })
+                return
+            }
 
-                if(!amount) {
-                    res.status(418).json({
-                        status: false,
-                        message: 'Please provide all required fields: amount',
-                        data: ""
-                    })
-                    return
-                } 
-                else if(!recipeName){
-                    res.status(418).json({
-                        status: false,
-                        message: `Please provide all required fields recipeName: ${recipeName}`,
-                        data: ""
-                    })
-                    return
-                }
-                else if(!preparationTime){
-                    res.status(418).json({
-                        status: false,
-                        message: `Please provide all required fields: ${preparationTime}`,
-                        data: ""
-                    })
-                    return
-                }else if(!status){
-                    res.status(418).json({
-                        status: false,
-                        message: 'Please provide all required fields: status',
-                        data: ""
-                    })
-                    return
-                }else if(!DetailIngredients){
-                    res.status(418).json({
-                        status: false,
-                        message: 'Please provide all required fields: DetailIngredients',
-                        data: ""
-                    })
-                    return
-                }else if(!Steps){
-                    res.status(418).json({
-                        status: false,
-                        message: 'Please provide all required fields: Steps',
-                        data: ""
-                    })
-                    return
-                }
-                else if(!cookingTime){
-                    res.status(418).json({
-                        status: false,
-                        message: 'Please provide all required fields: cookingTime',
-                        data: ""
-                    })
-                    return
-                }
+                // if(!amount) {
+                //     res.status(418).json({
+                //         status: false,
+                //         message: 'Please provide amount fields',
+                //         data: ""
+                //     })
+                //     return
+                // } 
+                // else if(!recipeName){
+                //     res.status(418).json({
+                //         status: false,
+                //         message: `Please provide recipeName fields`,
+                //         data: ""
+                //     })
+                //     return
+                // }
+                // else if(!preparationTime){
+                //     res.status(418).json({
+                //         status: false,
+                //         message: `Please provide preparationTime fields: ${preparationTime}`,
+                //         data: ""
+                //     })
+                //     return
+                // }else if(!status){
+                //     res.status(418).json({
+                //         status: false,
+                //         message: 'Please provide all required fields: status',
+                //         data: ""
+                //     })
+                //     return
+                // }else if(!DetailIngredients){
+                //     res.status(418).json({
+                //         status: false,
+                //         message: 'Please provide all required fields: DetailIngredients',
+                //         data: ""
+                //     })
+                //     return
+                // }else if(!Steps){
+                //     res.status(418).json({
+                //         status: false,
+                //         message: 'Please provide all required fields: Steps',
+                //         data: ""
+                //     })
+                //     return
+                // }
+                // else if(!cookingTime){
+                //     res.status(418).json({
+                //         status: false,
+                //         message: 'Please provide all required fields: cookingTime',
+                //         data: ""
+                //     })
+                //     return
+                // }
                 try {
                     DetailIngredients = JSON.parse(DetailIngredients)
                     Steps = JSON.parse(Steps)

@@ -159,7 +159,7 @@ class userController {
             if(emailCheck) {
                 res.status(422).json({
                     success: false,
-                    message: "Email already exists ",
+                    message: "Email already exists",
                     data: ""
                 })
                 return
@@ -176,11 +176,11 @@ class userController {
                     user.avatar = req.files.user ? `/user/${req.files.user[0].filename}` : oldImage
                     user.introduce = introduce ? introduce : ''
                     
-                    if(req.files.user && oldImage !== null){
-                        fs.unlink(`public/image${oldImage}`, error => {
-                            if(error) throw error
-                        })
-                    }
+                    // if(req.files.user && oldImage !== null){
+                    //     fs.unlink(`public/image${oldImage}`, error => {
+                    //         if(error) throw error
+                    //     })
+                    // }
 
                     let updated = await user.save()
     
