@@ -158,7 +158,7 @@ class authController {
     handleChangePassword = async (req, res) => {
         let {accountName, newPassword, checkPassword, otp} = req.body
         try {
-            const currentTime = new Date()
+            const currentTime1 = new Date()
             let account = await db.Account.findByPk(accountName)
 
             if(!account){
@@ -201,6 +201,7 @@ class authController {
 
             let dateFormat = "DD-MM-YYYY HH:mm:ss"
             let expireTime = moment(checkOtp.duration, dateFormat).toDate()
+            let currentTime = moment(currentTime1, dateFormat).utcOffset("+07:00").toDate()
             console.log(expireTime)
             console.log(currentTime)
             if (currentTime.getTime() > expireTime.getTime()) {
