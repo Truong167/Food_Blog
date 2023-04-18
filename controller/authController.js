@@ -6,6 +6,7 @@ const {
     validatePassword,
     checkAccountExists
 } = require('../middlewares/validator')
+const moment = require('moment')
 const {sequelize} = require('../models/index')
 const jwt = require('jsonwebtoken')
 const mailer = require('../middlewares/utils/mailer')
@@ -197,14 +198,18 @@ class authController {
                     data: ""
                 })
             }
-            const expireTime = new Date(checkOtp.duration)
-            if (currentTime.getTime() > expireTime.getTime()) 
+
+            let dateFormat = "DD-MM-YYYY HH:mm:ss"
+            let expireTime = moment(checkOtp.duration, dateFormat).toDate()
+            if (currentTime.getTime() > expireTime.getTime()) {
                 return res.status(451).json({
                     success: false,
                     message: 'OTP expired',
                     data: ""
                 })
 
+            }
+            
 
             account.password = bcrypt.hashSync(newPassword, 10)
             await account.save()
