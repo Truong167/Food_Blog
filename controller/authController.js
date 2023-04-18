@@ -184,12 +184,19 @@ class authController {
                     data: ""
                 })
             }
-            if (!bcrypt.compareSync(otp, checkOtp.value)) 
+            // if (!bcrypt.compareSync(otp, checkOtp.value)) 
+            //     return res.status(450).json({
+            //         success: false,
+            //         message: 'Incorrect OTP',
+            //         data: ""
+            //     })
+            if(otp !== checkOtp.value){
                 return res.status(450).json({
                     success: false,
                     message: 'Incorrect OTP',
                     data: ""
                 })
+            }
             const expireTime = new Date(checkOtp.duration)
             if (currentTime.getTime() > expireTime.getTime()) 
                 return res.status(451).json({
@@ -237,17 +244,18 @@ class authController {
             })
             let data = [{
                 email: user.email,
-                value: bcrypt.hashSync(otpGenerator, 10),
+                // value: bcrypt.hashSync(otpGenerator, 10),
+                value: otpGenerator,
                 duration: expire
             }]
             let otp = await db.Otp.bulkCreate(data, {updateOnDuplicate: ["email", "value", "duration"]})
             // Thực hiện gửi email
-            await mailer.sendMail(user.email, subject, otpGenerator)
+            // await mailer.sendMail(user.email, subject, otpGenerator)
             // Quá trình gửi email thành công thì gửi về thông báo success cho người dùng
             res.status(200).json({
                 success: true,
                 message: 'Successfully send otp',
-                data: otp
+                data: otp[0].duration
             })
           } catch (error) {
             res.status(500).json({

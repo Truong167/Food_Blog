@@ -14,16 +14,20 @@ var readHTMLFile = function(path, callback) {
 
 const mailHost = 'smtp.gmail.com'
 // 587 là một cổng tiêu chuẩn và phổ biến trong giao thức SMTP
-const mailPort = 587
+const mailPort = 465
 const sendMail = (to, subject, htmlContent) => {
   // Khởi tạo một thằng transporter object sử dụng chuẩn giao thức truyền tải SMTP với các thông tin cấu hình ở trên.
   const transporter = nodeMailer.createTransport({
     host: mailHost,
     port: mailPort,
-    secure: false, 
+    secure: true, 
     auth: {
       user: process.env.ADMIN_EMAIL,
       pass: process.env.ADMIN_PASSWORD_EMAIL
+    },
+    tls: {
+        // do not fail on invalid certs
+        rejectUnauthorized: false
     }
   })
   const options = {

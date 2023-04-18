@@ -2,6 +2,8 @@
 const {
   Model
 } = require('sequelize');
+const formatDate = require('../middlewares/utils/formatDate');
+
 module.exports = (sequelize, DataTypes) => {
   class Otp extends Model {
     /**
@@ -19,7 +21,12 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
     },
     value: DataTypes.STRING,
-    duration: DataTypes.DATE,
+    duration: {
+      type: DataTypes.DATE,
+      get: function() {
+        return formatDate(this.getDataValue('duration'))
+      }
+    },
   }, {
     sequelize,
     freezeTableName: true,
