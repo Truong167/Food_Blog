@@ -935,6 +935,7 @@ class recipeController {
 
     handleGetRecipeByName = async (req, res) => {
         try {
+            const userId = req.userId
             const {slug} = req.params
             const recipe = await db.Recipe.findAll({
                 where: {
@@ -944,9 +945,17 @@ class recipeController {
                 },
                 include: {
                     model: db.User,
-                    attributes: ["fullName", "avatar", "userId"]
+                    attributes: ["fullName", "avatar", "userId", 
+                    [sequelize.literal(` (SELECT CASE WHEN EXISTS 
+                        (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${userId}) 
+                        then True else False end isFollow) `), "isFollow"]
+                    ]
                 },
-                    attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image", "description", "status"],
+                    attributes: ["recipeId", "recipeName", "date", "numberOfLikes", "image", "description", "status",
+                    [sequelize.literal(`(SELECT CASE WHEN EXISTS 
+                        (SELECT * FROM "Favorite" WHERE "recipeId" = "Recipe"."recipeId" and "userId" = ${userId}) 
+                        THEN True ELSE False end isFavorite) `), "isFavorite"]    
+                ],
                     order: [["date", 'DESC']]
             })
             if(recipe && recipe.length > 0){
