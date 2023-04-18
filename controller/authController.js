@@ -11,6 +11,7 @@ const {sequelize} = require('../models/index')
 const jwt = require('jsonwebtoken')
 const mailer = require('../middlewares/utils/mailer')
 const OtpGenerator = require('otp-generator')
+const formatDate = require('../middlewares/utils/formatDate')
 require('dotenv').config()
 
 class authController {
@@ -201,10 +202,13 @@ class authController {
 
             let dateFormat = "DD-MM-YYYY HH:mm:ss"
             let expireTime = moment(checkOtp.duration, dateFormat).toDate()
-            let currentTime = moment(currentTime1, dateFormat).utcOffset("+07:00").toDate()
-            console.log(expireTime)
+            let currentTime = formatDate(currentTime1)
+            let temp = moment(currentTime, dateFormat).toDate()
+            console.log(checkOtp.duration)
             console.log(currentTime)
-            if (currentTime.getTime() > expireTime.getTime()) {
+            console.log(expireTime)
+            console.log(temp)
+            if (temp.getTime() > expireTime.getTime()) {
                 return res.status(451).json({
                     success: false,
                     message: 'OTP expired',
