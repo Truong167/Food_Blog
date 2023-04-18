@@ -201,6 +201,8 @@ class authController {
 
             let dateFormat = "DD-MM-YYYY HH:mm:ss"
             let expireTime = moment(checkOtp.duration, dateFormat).toDate()
+            console.log(expireTime)
+            console.log(currentTime)
             if (currentTime.getTime() > expireTime.getTime()) {
                 return res.status(451).json({
                     success: false,
