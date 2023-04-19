@@ -1041,6 +1041,7 @@ class recipeController {
     getRecipeByUserId1 = async (req, res) => {
         try {
             const userId = req.params.userId
+            const userId1 = req.userId
             const recipe = await db.Recipe.findAll({
                 where: {
                     [Op.and]: [
@@ -1056,7 +1057,7 @@ class recipeController {
                 attributes: [
                     "recipeId", "recipeName", "date", "numberOfLikes", "image", "status",
                     [sequelize.literal(`(SELECT CASE WHEN EXISTS 
-                        (SELECT * FROM "Favorite" WHERE "recipeId" = "Recipe"."recipeId" and "userId" = ${userId}) 
+                        (SELECT * FROM "Favorite" WHERE "recipeId" = "Recipe"."recipeId" and "userId" = ${userId1}) 
                         THEN True ELSE False end isFavorite) `), "isFavorite"]
                 ], 
                 include: [

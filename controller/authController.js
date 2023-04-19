@@ -192,6 +192,12 @@ class authController {
             //         message: 'Incorrect OTP',
             //         data: ""
             //     })
+            if (!checkOtp) 
+                return res.status(449).json({
+                    success: false,
+                    message: 'Invalid OTP',
+                    data: ""
+                })
             if(otp !== checkOtp.value){
                 return res.status(450).json({
                     success: false,
@@ -282,7 +288,7 @@ class authController {
         let {userId} = req
         let {newPassword, checkPassword, otp} = req.body
         try {
-            const currentTime = new Date()
+            const currentTime1 = new Date()
             let account = await db.Account.findOne({
                 where: {
                     userId: userId
@@ -303,14 +309,22 @@ class authController {
                     message: 'Incorrect OTP',
                     data: ""
                 })
-            const expireTime = new Date(checkOtp.duration)
-            console.log(expireTime.getTime());
-            if (currentTime.getTime() > expireTime.getTime()) 
-                return res.status(451).json({
-                    success: false,
-                    message: 'OTP expired',
-                    data: ""
-                })
+                let dateFormat = "DD-MM-YYYY HH:mm:ss"
+                let expireTime = moment(checkOtp.duration, dateFormat).toDate()
+                let currentTime = formatDate(currentTime1)
+                let temp = moment(currentTime, dateFormat).toDate()
+                console.log(checkOtp.duration)
+                console.log(currentTime)
+                console.log(expireTime)
+                console.log(temp)
+                if (temp.getTime() > expireTime.getTime()) {
+                    return res.status(451).json({
+                        success: false,
+                        message: 'OTP expired',
+                        data: ""
+                    })
+    
+                }
             if(!account){
                 return res.status(424).json({
                     success: false,
