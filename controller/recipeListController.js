@@ -15,7 +15,8 @@ class recipeListController {
                 where: {
                     userId: userId
                 },
-                attributes: ["recipeListId", "name", "image"]
+                attributes: ["recipeListId", "name", "image"],
+                order: [['date', 'DESC']]
             })
             if(recipeList && recipeList.length > 0) {
                 res.status(200).json({

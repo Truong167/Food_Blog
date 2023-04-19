@@ -1069,6 +1069,14 @@ class recipeController {
                         },
                         attributes: ["recipeListId"]
                     }, 
+                    {
+                        model: db.User,
+                        attributes: ["fullName", "avatar", "userId", 
+                        [sequelize.literal(` (SELECT CASE WHEN EXISTS 
+                            (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${userId1}) 
+                            then True else False end isFollow) `), "isFollow"]
+                        ]
+                    },
                 ]
             })
             const user = await db.User.findByPk(userId)

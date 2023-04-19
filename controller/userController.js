@@ -94,12 +94,13 @@ class userController {
 
     getUserById1 = async (req, res) => {
         try {
+            let {userId} = req
             let { id } = req.params
             let user = await db.User.findByPk(id, {
                 attributes: {
                     exclude: ["dateUpdatedRecipe", "createdAt", "updatedAt"], 
                     include: [[sequelize.literal(` (SELECT CASE WHEN EXISTS 
-                        (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${id}) 
+                        (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${userId}) 
                         then True else False end isFollow) `), "isFollow"],
                         [sequelize.literal(` (Select count(*) from "Recipe" where "userId" = ${id}) `), "countRecipe"],
                         [sequelize.literal(` (Select count(*) from "Follow" where "userIdFollow" = ${id}) `), "countFollowing"],
