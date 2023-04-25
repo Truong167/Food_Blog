@@ -41,7 +41,7 @@ class userController {
                         attributes: [
                             "recipeId", "recipeName", "date", "numberOfLikes", "image", "status",
                             [sequelize.literal(`(SELECT CASE WHEN EXISTS 
-                                (SELECT * FROM "Favorite" WHERE "recipeId" = "Recipes"."recipeId" and "userId" = ${id}) 
+                                (SELECT * FROM "Favorite" WHERE "recipeId" = "Recipes"."recipeId" and "userId" = ${userId}) 
                                 THEN True ELSE False end isFavorite) `), "isFavorite"]
                         ],
                         order: [['date', 'DESC']],
@@ -50,7 +50,7 @@ class userController {
                 attributes: {
                     exclude: ["dateUpdatedRecipe", "createdAt", "updatedAt"], 
                     include: [[sequelize.literal(` (SELECT CASE WHEN EXISTS 
-                        (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${id}) 
+                        (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${userId}) 
                         then True else False end isFollow) `), "isFollow"]]
                 },
             })

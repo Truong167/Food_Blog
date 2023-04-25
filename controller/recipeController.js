@@ -236,59 +236,6 @@ class recipeController {
                 return
             }
 
-                // if(!amount) {
-                //     res.status(418).json({
-                //         status: false,
-                //         message: 'Please provide amount fields',
-                //         data: ""
-                //     })
-                //     return
-                // } 
-                // else if(!recipeName){
-                //     res.status(418).json({
-                //         status: false,
-                //         message: `Please provide recipeName fields`,
-                //         data: ""
-                //     })
-                //     return
-                // }
-                // else if(!preparationTime){
-                //     res.status(418).json({
-                //         status: false,
-                //         message: `Please provide preparationTime fields: ${preparationTime}`,
-                //         data: ""
-                //     })
-                //     return
-                // }else if(!status){
-                //     res.status(418).json({
-                //         status: false,
-                //         message: 'Please provide all required fields: status',
-                //         data: ""
-                //     })
-                //     return
-                // }else if(!DetailIngredients){
-                //     res.status(418).json({
-                //         status: false,
-                //         message: 'Please provide all required fields: DetailIngredients',
-                //         data: ""
-                //     })
-                //     return
-                // }else if(!Steps){
-                //     res.status(418).json({
-                //         status: false,
-                //         message: 'Please provide all required fields: Steps',
-                //         data: ""
-                //     })
-                //     return
-                // }
-                // else if(!cookingTime){
-                //     res.status(418).json({
-                //         status: false,
-                //         message: 'Please provide all required fields: cookingTime',
-                //         data: ""
-                //     })
-                //     return
-                // }
                 try {
                     DetailIngredients = JSON.parse(DetailIngredients)
                     Steps = JSON.parse(Steps)
@@ -468,6 +415,141 @@ class recipeController {
                 res.status(500).json({
                     success: false, 
                     message: error.message,
+                    data: ""
+                })
+            }
+        })
+    }
+
+    handleUpdateRecpipe1 = async (req, res) => {
+        let uploadFile = multerConfig().fields([
+            {
+                name: "recipe",
+                maxCount: 1
+            },
+            {
+                name: "step",
+                maxCount: 20
+            }
+        ])
+        uploadFile(req, res, async error => {
+            if(error){
+                return res.status(440).json({
+                    success: false,
+                    message: `Error when trying to upload: ${error}`,
+                    data: ""
+                })
+            }
+            try {
+                let { recipeName, amount, status, preparationTime, cookingTime, description, DetailIngredients, Steps} = req.body
+                if(!recipeName || !amount || !preparationTime || !cookingTime || !status || !DetailIngredients || !Steps) {
+                    res.status(418).json({
+                        status: false,
+                        message: 'Please provide all required fields',
+                        data: ""
+                    })
+                    return
+                }
+                let recipeId  = req.params.id
+                DetailIngredients = JSON.parse(DetailIngredients)
+                Steps = JSON.parse(Steps)
+                let recipe = await db.Recipe.findByPk(recipeId)
+                let ingredient = await db.DetailIngredient.findAll({where: {recipeId: recipeId}})
+                let step = await db.Step.findAll({where: {recipeId: recipeId}})
+                step = step.filter(({ stepId: id1 }) => !Steps.some(({ stepId: id2 }) => id2 === id1) );
+                step = step.map(item => {
+                    return item.dataValues.stepId
+                })
+                ingredient = ingredient.filter(({ingredientId: id1}) => !DetailIngredients.some(({ingredientId: id2}) => id1 === id2))
+                ingredient = ingredient.map(item => {
+                    return item.dataValues.ingredientId
+                })
+                let index = 0
+                console.log(req.files)
+                for(let i = 0; i < Steps.length; i++){
+                    if(Steps[i].imageFile) {
+                        console.log(Steps[i].imageFile)
+                        Steps[i].image = `/step/${req.files.step[index].filename}`
+                        index++
+                    } 
+                    Steps[i].recipeId = recipe.recipeId
+                }
+                DetailIngredients = DetailIngredients.map(item => {
+                    item.recipeId = recipeId
+                    return item
+                })
+                console.log("Steps1: ", Steps)
+                if(recipe) {
+                    const updateRecipe = await sequelize.transaction(async t => {
+                        if(step.length > 0) {
+                            await db.Step.destroy({where: {
+                                stepId: {
+                                    [Op.or]: step
+                                }
+                            }}, {transaction: t})
+                            await db.Step.bulkCreate(Steps, {
+                                updateOnDuplicate: ["stepId", "stepIndex", "description", "recipeId", "image"],
+                            } ,{transaction: t})
+                        } else {
+                            await db.Step.bulkCreate(Steps, {
+                                updateOnDuplicate: ["stepId", "stepIndex", "description", "recipeId", "image"],
+                            } ,{transaction: t})
+                        }
+                        if(ingredient.length > 0) {
+                            await db.DetailIngredient.destroy(
+                                {
+                                    where: {
+                                        [Op.and]: [
+                                            {
+                                                ingredientId: {
+                                                    [Op.or]: ingredient
+                                                }
+                                            },
+                                            {
+                                                recipeId: recipeId
+                                            }
+                                        ]
+                                        
+                                    },
+                                }, {transaction: t})
+                            await db.DetailIngredient.bulkCreate(DetailIngredients, {
+                                updateOnDuplicate: ["ingredientId", "recipeId", "amount"]
+                            }, {transaction: t})
+                        } else {
+                            await db.DetailIngredient.bulkCreate(DetailIngredients, {
+                                updateOnDuplicate: ["ingredientId", "recipeId", "amount"]
+                            }, {transaction: t})
+                        }
+                        console.log('allala')
+                        recipe.recipeName = recipeName
+                        recipe.amount = amount
+                        recipe.preparationTime = preparationTime
+                        recipe.cookingTime = cookingTime
+                        recipe.status = status
+                        recipe.description = description
+                        recipe.image = req.files.recipe ? `/recipe/${req.files.recipe[0].filename}` : recipe.image
+        
+                        await recipe.save({transaction: t})
+        
+                        res.status(200).json({
+                            success: true, 
+                            message: 'Successfully updated recipe',
+                            data: ""
+                        })
+                    })
+
+                } else {
+                    res.status(432).json({
+                        success: false, 
+                        message: 'Recipe not found',
+                        data: ""
+                    })
+                }
+    
+            } catch (error) {
+                res.status(500).json({
+                    success: false, 
+                    message: error,
                     data: ""
                 })
             }
@@ -657,7 +739,7 @@ class recipeController {
         try {
             let { id } = req.params
             let {status} = req.body
-
+            console.log(status)
             let recipe = await db.Recipe.findByPk(id)
 
             if(recipe) {
