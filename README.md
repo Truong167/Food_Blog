@@ -1,4 +1,5 @@
 Mô tả Food Blog API
+- Quản lý nguyên liệu: Thêm, xóa, sửa nguyên liệu (chỉ admin)
 - Quản lý công thức: thêm, xóa, sửa, có thể công khai cho mọi người xem hoặc có thể chuyển thành riêng tư
 - Gợi ý công thức: gợi ý công thức dựa trên mùa (xuân, hạ, thu, đông), các công thức phổ biến trong tuần, hay các công thức mới cập nhật từ người dùng đã theo dõi
 - Tìm kiếm và hiển thị chi tiết của công thức

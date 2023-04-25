@@ -268,7 +268,7 @@ class authController {
             }]
             let otp = await db.Otp.bulkCreate(data, {updateOnDuplicate: ["email", "value", "duration"]})
             // Thực hiện gửi email
-            // await mailer.sendMail(user.email, subject, otpGenerator)
+            await mailer.sendMail(user.email, subject, otpGenerator)
             // Quá trình gửi email thành công thì gửi về thông báo success cho người dùng
             res.status(200).json({
                 success: true,
