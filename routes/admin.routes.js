@@ -7,9 +7,16 @@ const verifyToken = require('../middlewares/auth')
 
 // http://localhost:8080/api/v1/admin
 
+router.get('/getStatisticalOfIngredient', adminController.statisticalOfIngredient)
+
 
 router.post('/login', adminController.handleLoginAdmin)
-router.get('/getStatisticalOfIngredient', adminController.statisticalOfIngredient)
+router.post('/createIngredient', adminController.createIngredient)
+
+router.put('/updateIngredient/:ingredientId', adminController.updateIngredient)
+
+
+router.delete('/deleteIngredient/:ingredientId', adminController.deleteIngredient)
 
 
 

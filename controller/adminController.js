@@ -1,16 +1,9 @@
 const bcrypt = require('bcryptjs')
 const db = require('../models/index')
-const {
-    checkEmailExists,
-    validateEmail,
-    validatePassword,
-    checkAccountExists
-} = require('../middlewares/validator')
-const moment = require('moment')
 const {sequelize} = require('../models/index')
-const jwt = require('jsonwebtoken')
-const mailer = require('../middlewares/utils/mailer')
-const OtpGenerator = require('otp-generator')
+const Sequelize = require('sequelize')
+const { Op } = Sequelize
+let multerConfig = require("../middlewares/utils/multerConfig")
 const {formatDate1} = require('../middlewares/utils/formatDate')
 require('dotenv').config()
 
@@ -99,6 +92,196 @@ class adminController {
             })
         }
     }
+
+    createIngredient = async (req, res) => {
+        let uploadFile = multerConfig().fields(
+            [
+                {
+                    name: 'ingredient',
+                    maxCount: 1
+                },
+            ]
+        )
+        uploadFile( req, res, async (error) => {
+            let { ingredientId, name, season } = req.body
+            let seasonObj = []
+            if(error) {
+                return res.status(440).json({
+                    success: false, 
+                    message: `Error when trying to upload: ${error.message}`,
+                    data: ""
+                });
+            } 
+            if(!ingredientId || !name){
+                res.status(418).json({
+                    status: false,
+                    message: 'Please provide all required fields',
+                    data: ""
+                })
+                return
+            }
+            // if(season.length == 0){
+            //     for(let i = 1; i < 5; i++){
+            //         seasonObj.push({ingredientId, seasonId: i})
+            //     }
+            // } else {
+            //     seasonObj =  season.map(item => {
+            //         item.ingredientId = ingredientId
+            //         return item
+            //     })
+            // }
+            season.map(item => {
+                item.ingredientId = ingredientId
+                return item
+            })
+            try {
+                const result = await sequelize.transaction(async t => {
+                    let ingredient = await db.Ingredient.create({
+                        ingredientId: ingredientId,
+                        name: name,
+                        image: req.files.ingredient ? `/ingredient/${req.files.ingredient[0].filename}` : null
+                    }, { transaction: t })
+                    let ingredientSeason = await db.IngredientSeason.bulkCreate(season, { transaction: t })
+                    return {ingredient, ingredientSeason}
+                })
+                res.status(200).json({
+                    success: true, 
+                    message: 'Successfully added',
+                    data: result
+                })
+            } catch (error) {
+                res.status(500).json({
+                    success: false, 
+                    message: error.message, 
+                    data: ""
+                })
+            }
+        })
+    }
+
+    updateIngredient = async (req, res) => {
+        let uploadFile = multerConfig().fields(
+            [
+                {
+                    name: 'ingredient',
+                    maxCount: 1
+                },
+            ]
+        )
+        uploadFile( req, res, async (error) => {
+            // let season = [{seasonId: 1}]
+            let { season, name } = req.body
+            let {ingredientId} = req.params
+            if(error) {
+                return res.status(440).json({
+                    success: false, 
+                    message: `Error when trying to upload: ${error.message}`,
+                    data: ""
+                });
+            } 
+            if(!ingredientId || !name){
+                res.status(418).json({
+                    status: false,
+                    message: 'Please provide all required fields: data',
+                    data: ""
+                })
+                return
+            }
+            try {
+                let seasonList = await db.IngredientSeason.findAll({where: {ingredientId: ingredientId}})
+                // lọc các phần tử trong seasonList không trùng với các phần tử trong season
+                seasonList = seasonList.filter(({seasonId: id1}) => !season.some(({seasonId: id2}) => id1 === id2))
+                seasonList = seasonList.map(item => (item.dataValues.seasonId))
+                season.map(item => {
+                    item.ingredientId = ingredientId
+                    return item
+                })
+                let ingredient = await db.Ingredient.findByPk(ingredientId)
+                if(ingredient){
+                    const updateIngredient = await sequelize.transaction(async t => {
+                        if(seasonList.length > 0) {
+                            await db.IngredientSeason.destroy({
+                                where: {
+                                    [Op.and]: [
+                                        {
+                                            seasonId: {
+                                                [Op.or]: seasonList
+                                            }
+                                        },
+                                        {
+                                            ingredientId: ingredientId
+                                        }
+                                    ]
+                                    
+                                },
+                            }, {transaction: t})
+                            await db.IngredientSeason.bulkCreate(season, {
+                                updateOnDuplicate: ["seasonId", "ingredientId"],
+                            } ,{transaction: t})
+                        } else {
+                            await db.IngredientSeason.bulkCreate(season, {
+                                updateOnDuplicate: ["seasonId", "ingredientId"],
+                            } ,{transaction: t})
+                        }
+                        ingredient.name = name
+                        ingredient.image =  req.files.ingredient ? `/ingredient/${req.files.ingredient[0].filename}` : ingredient.image
+                        await ingredient.save({transaction: t})
+                    })
+                    return res.status(200).json({
+                        success: true, 
+                        message: 'Successfully update',
+                        data: ingredient
+                    })
+                }
+                res.status(427).json({
+                    success: false, 
+                    message: 'Ingredient not found',
+                    data: ""
+                })
+            } catch (error) {
+                res.status(500).json({
+                    success: false, 
+                    message: error.message, 
+                    data: ""
+                })
+            }
+        })
+    }
+
+    deleteIngredient = async (req, res) => {
+        let { ingredientId } = req.params
+        try {
+            let dtIngredient = await db.DetailIngredient.findAll({
+                where: {
+                    ingredientId: ingredientId
+                }
+            })
+            if(dtIngredient && dtIngredient.length > 0){
+                return res.status(453).json({
+                    success: false,
+                    message: 'Unable to delete ingredient that already exist in some recipes',
+                    data: ''
+                })
+            }
+            await sequelize.transaction(async t => {
+                await db.IngredientSeason.destroy({where: {ingredientId: ingredientId}}, { transaction: t })
+                await db.Ingredient.destroy({where: {ingredientId: ingredientId}}, { transaction: t })
+            })
+
+            res.status(200).json({
+                success: true, 
+                message: 'Successfully delete',
+                data: ''
+            })
+        } catch (error) {
+            res.status(500).json({
+                success: false, 
+                message: error.message, 
+                data: ""
+            })
+        }
+    }
+
 }
 
 module.exports = new adminController

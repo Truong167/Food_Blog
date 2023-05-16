@@ -15,6 +15,9 @@ function multerConfig(){
       } else if (file.fieldname === "recipeList") {
         callback(null, 'public/image/recipeList')
       }
+      else if (file.fieldname === "ingredient") {
+        callback(null, 'public/image/ingredient')
+      }
       },
       filename: (req, file, callback) => {
       // Kiểm tra ext 
