@@ -282,6 +282,47 @@ class adminController {
         }
     }
 
+    getIngredient = async (req, res) => {
+        let { ingredientId } = req.params
+        try {
+            let ingredient = await db.Ingredient.findByPk(ingredientId, {
+                include: {
+                    model: db.IngredientSeason,
+                    include: {
+                        model: db.Season,
+                        attributes: ['nameOfSeason']
+                    },
+                    attributes: ["seasonId"]
+                }, 
+                attributes: ['ingredientId', 'name', 'image', 'createdAt']
+            })
+            if(ingredient) {
+                ingredient.dataValues.createdAt = formatDate1(ingredient.dataValues.createdAt)
+                ingredient.dataValues.IngredientSeasons.map(item => {
+                    item.dataValues.seasonName = item.dataValues.Season.nameOfSeason
+                    delete item.dataValues['Season']
+                })
+                res.status(200).json({
+                    success: true, 
+                    message: 'Successfully get data',
+                    data: ingredient
+                })
+                return
+            }
+            res.status(427).json({
+                success: false, 
+                message: 'Ingredient not found',
+                data: ""
+            })
+        } catch (error) {
+            res.status(500).json({
+                success: false, 
+                message: error.message, 
+                data: ""
+            })
+        }
+    }
+
 }
 
 module.exports = new adminController

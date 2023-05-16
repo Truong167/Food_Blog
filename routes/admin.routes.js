@@ -8,6 +8,7 @@ const verifyToken = require('../middlewares/auth')
 // http://localhost:8080/api/v1/admin
 
 router.get('/getStatisticalOfIngredient', adminController.statisticalOfIngredient)
+router.get('/getIngredient/:ingredientId', adminController.getIngredient)
 
 
 router.post('/login', adminController.handleLoginAdmin)
