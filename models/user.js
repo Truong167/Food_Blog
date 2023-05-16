@@ -2,7 +2,7 @@
 const {
   Model
 } = require('sequelize');
-const formatDate = require('../middlewares/utils/formatDate')
+const {formatDate} = require('../middlewares/utils/formatDate')
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**

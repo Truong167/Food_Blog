@@ -11,7 +11,7 @@ const {sequelize} = require('../models/index')
 const jwt = require('jsonwebtoken')
 const mailer = require('../middlewares/utils/mailer')
 const OtpGenerator = require('otp-generator')
-const formatDate = require('../middlewares/utils/formatDate')
+const {formatDate1} = require('../middlewares/utils/formatDate')
 require('dotenv').config()
 
 class adminController {
@@ -60,7 +60,7 @@ class adminController {
             let ingredient = await db.DetailIngredient.findAll({
                 include: {
                     model: db.Ingredient,
-                    attributes: ["name", "image"]
+                    attributes: ["name", "image", "createdAt"]
                 },
                 attributes: [
                     "ingredientId",
@@ -73,6 +73,7 @@ class adminController {
                 ingredient.map(item => {
                     item.dataValues.name = item.dataValues.Ingredient.dataValues.name
                     item.dataValues.image = item.dataValues.Ingredient.dataValues.image
+                    item.dataValues.createdAt = formatDate1(item.dataValues.Ingredient.dataValues.createdAt)
                     delete item.dataValues['Ingredient']
                     return item
                 })
