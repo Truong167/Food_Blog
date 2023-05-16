@@ -88,6 +88,7 @@ class ingredientController {
             })
         }
     }
+
 }
 
 module.exports = new ingredientController

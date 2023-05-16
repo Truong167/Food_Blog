@@ -8,6 +8,7 @@ const favoriteRouter = require('./favorite.routes')
 const followRouter = require('./follow.routes')
 const authRouter = require('./auth.routes')
 const stepRouter = require('./step.routes')
+const adminRouter = require('./admin.routes')
 const verifyToken = require('../middlewares/auth')
 
 
@@ -27,6 +28,8 @@ function routes(app){
     app.use('/api/v1/follow',verifyToken, followRouter)
     app.use('api/v1/step', verifyToken, stepRouter)
     app.use('/api/v1/auth', authRouter)
+    app.use('/api/v1/admin', adminRouter)
+
     
     // app.use('/api/v1/user', userRouter)
     // app.use('/api/v1/recipe', recipeRouter)

@@ -156,6 +156,8 @@ class authController {
         }
     }
 
+    
+
     handleChangePassword = async (req, res) => {
         let {accountName, newPassword, checkPassword, otp} = req.body
         try {

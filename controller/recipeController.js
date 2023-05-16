@@ -740,6 +740,7 @@ class recipeController {
             let { id } = req.params
             let {status} = req.body
             console.log(status)
+            console.log(req.body)
             let recipe = await db.Recipe.findByPk(id)
 
             if(recipe) {
