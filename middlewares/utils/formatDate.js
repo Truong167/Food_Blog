@@ -8,8 +8,13 @@ const formatDate1 = function(date) {
     return moment(date).utcOffset("+07:00").format('YYYY-MM-DD');
 }
 
+const formatDate2 = function(date) {
+    return moment(date).utcOffset("+07:00").format('MM-YYYY');
+}
+
 
 module.exports = {
     formatDate,
-    formatDate1
+    formatDate1,
+    formatDate2
 }

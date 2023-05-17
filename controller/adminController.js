@@ -4,7 +4,7 @@ const {sequelize} = require('../models/index')
 const Sequelize = require('sequelize')
 const { Op } = Sequelize
 let multerConfig = require("../middlewares/utils/multerConfig")
-const {formatDate1} = require('../middlewares/utils/formatDate')
+const {formatDate1, formatDate2} = require('../middlewares/utils/formatDate')
 require('dotenv').config()
 
 class adminController {
@@ -318,6 +318,90 @@ class adminController {
             res.status(500).json({
                 success: false, 
                 message: error.message, 
+                data: ""
+            })
+        }
+    }
+
+    statisticalOfIngredient1 = async (req, res) => {
+        let { ingredientId } = req.params
+        try {
+            let ingredient = await db.DetailIngredient.findAll({
+                where: {
+                    ingredientId: ingredientId
+                },
+                include: [
+                    {
+                    model: db.Ingredient,
+                    attributes: ["name", "image", "createdAt"],
+                    },
+                ],
+                attributes: [
+                    "ingredientId",
+                    [sequelize.fn('COUNT', sequelize.col('DetailIngredient.ingredientId')), 'recipeUsed']
+                ],
+                group: ['Ingredient.ingredientId', 'DetailIngredient.ingredientId']
+            })
+
+            let useStatiscal = await db.DetailIngredient.findAll({
+                where: {
+                    ingredientId: ingredientId
+                },
+                attributes: [
+                    [sequelize.fn('COUNT', sequelize.col('DetailIngredient.ingredientId')), 'use'],
+                    [sequelize.fn('date_trunc', 'month', sequelize.col('createdAt')), 'time']
+                ],
+                group: ['DetailIngredient.ingredientId', [sequelize.fn('date_trunc', 'month', sequelize.col('createdAt')), 'use']]
+            })
+
+            let season = await db.IngredientSeason.findAll({
+                where: {
+                    ingredientId: ingredientId
+                },
+                include: {
+                    model: db.Season,
+                    attributes: ['nameOfSeason']
+                },
+                attributes: ['seasonId']
+            })
+            
+            
+            if(ingredient && ingredient.length > 0){
+                useStatiscal.map(item => {
+                    item.dataValues.time = formatDate2(item.dataValues.time)
+                    return item
+                })
+                season.map(item => {
+                    item.dataValues.seasonName = item.dataValues.Season.nameOfSeason
+                    delete item.dataValues['Season']
+                    return item
+                })
+                ingredient.map(item => {
+                        item.dataValues.name = item.dataValues.Ingredient.dataValues.name
+                        item.dataValues.image = item.dataValues.Ingredient.dataValues.image
+                        item.dataValues.createdAt = formatDate1(item.dataValues.Ingredient.dataValues.createdAt)
+                        item.dataValues.useStatiscal = useStatiscal
+                        item.dataValues.season = season
+                        delete item.dataValues['Ingredient']
+                        return item
+                })
+                return res.status(200).json({
+                    success: true, 
+                    message: 'Successfully get data',
+                    data: ingredient
+                })
+            }
+
+            res.status(452).json({
+                success: true, 
+                message: 'Do not have statistical',
+                data: ''
+            })
+            
+        } catch (error) {
+            res.status(500).json({
+                success: false, 
+                message: error.message,
                 data: ""
             })
         }
