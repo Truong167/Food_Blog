@@ -388,7 +388,7 @@ class adminController {
                 return res.status(200).json({
                     success: true, 
                     message: 'Successfully get data',
-                    data: ingredient
+                    data: ingredient[0]
                 })
             }
 
