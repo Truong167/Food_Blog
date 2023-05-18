@@ -48,7 +48,7 @@ class adminController {
         }
     }
 
-    statisticalOfIngredient = async (req, res) => {
+    statisticalOfIngredient2 = async (req, res) => {
         try {
             let ingredient = await db.DetailIngredient.findAll({
                 include: {
@@ -68,6 +68,48 @@ class adminController {
                     item.dataValues.image = item.dataValues.Ingredient.dataValues.image
                     item.dataValues.createdAt = formatDate1(item.dataValues.Ingredient.dataValues.createdAt)
                     delete item.dataValues['Ingredient']
+                    return item
+                })
+    
+                return res.status(200).json({
+                    success: true, 
+                    message: 'Successfully get data',
+                    data: ingredient
+                })
+            }
+
+            res.status(452).json({
+                success: true, 
+                message: 'Do not have statistical',
+                data: ingredient
+            })
+            
+        } catch (error) {
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: ""
+            })
+        }
+    }
+
+    statisticalOfIngredient = async (req, res) => {
+        try {
+            let ingredient = await db.Ingredient.findAll({
+                include: {
+                    model: db.DetailIngredient,
+                    attributes: [],
+                },
+                attributes: [
+                    "ingredientId", "name", "image", "createdAt",
+                    [sequelize.fn('COUNT', sequelize.col('DetailIngredients.ingredientId')), 'recipeUsed']
+                ],
+                group: ['DetailIngredients.ingredientId', 'Ingredient.ingredientId']
+            })
+
+            if(ingredient && ingredient.length > 0){
+                ingredient.map(item => {
+                    item.dataValues.createdAt = formatDate1(item.dataValues.createdAt)
                     return item
                 })
     
@@ -130,13 +172,11 @@ class adminController {
             //         return item
             //     })
             // }
-            console.log(req.body)
             season = JSON.parse(season)
             season.map(item => {
                 item.ingredientId = ingredientId
                 return item
             })
-            console.log(season)
 
             try {
                 const result = await sequelize.transaction(async t => {
@@ -410,6 +450,7 @@ class adminController {
             })
         }
     }
+
 
 }
 
