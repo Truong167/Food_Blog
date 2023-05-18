@@ -216,6 +216,7 @@ class adminController {
             // let season = [{seasonId: 1}]
             let { season, name } = req.body
             let {ingredientId} = req.params
+            season = JSON.parse(season)
             if(error) {
                 return res.status(440).json({
                     success: false, 
