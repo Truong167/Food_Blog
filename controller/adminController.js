@@ -4,6 +4,9 @@ const {sequelize} = require('../models/index')
 const Sequelize = require('sequelize')
 const { Op } = Sequelize
 let multerConfig = require("../middlewares/utils/multerConfig")
+const {
+    validatePassword,
+} = require('../middlewares/validator')
 const {formatDate1, formatDate2} = require('../middlewares/utils/formatDate')
 require('dotenv').config()
 
@@ -460,6 +463,99 @@ class adminController {
         }
     }
 
+    getInforAdmin = async (req, res) => {
+        let {accountName} = req.params
+        try {
+            let infor = await db.Admin.findByPk(accountName, {
+                attributes: ["accountName", "fullName", "phoneNumber"]
+            })
+            if(infor){
+                return res.status(200).json({
+                    success: true,
+                    message: 'Successfully get data',
+                    data: infor
+                })
+            }
+
+            res.status(424).json({
+                success: true,
+                message: 'Account does not exist',
+                data: ''
+            })
+
+        } catch (error) {
+            res.status(500).json({
+                success: true,
+                message: error.message,
+                data: ''
+            })
+        }
+    }
+
+    createAccount = async (req, res) => {
+        let {accountName, fullName, phoneNumber, password, password2} = req.body
+        try {
+            let checkExist = await db.Admin.findByPk(accountName)
+            let checkPhone = await db.Admin.findAll({
+                where: {
+                    phoneNumber: phoneNumber
+                }
+            })
+            if(checkExist){
+                return res.status(423).json({
+                    success: false,
+                    message: 'Account already exists',
+                    data: ""
+                })
+            }
+            if(!fullName || !phoneNumber || !accountName || !password || !password2){
+                res.status(418).json({
+                    success: false,
+                    message: 'Please provide all required fields',
+                    data: ""
+                })
+            } else if(checkPhone && checkPhone.length > 0){
+                res.status(454).json({
+                    success: false,
+                    message: 'Phone number already exists',
+                    data: ""
+                })
+            } else if( password != password2){
+                res.status(419).json({
+                    success: false,
+                    message: 'The entered passwords do not match',
+                    data: ""
+                })
+            } else if(!validatePassword(password)){
+                return res.status(420).json({
+                    success: false,
+                    message:
+                      'Your password must be at least 6 characters long and contain a lowercase letter, an uppercase letter, a numeric digit and a special character.',
+                    data: ""
+                  })
+            } else {
+                await db.Admin.create({
+                    accountName: accountName,
+                    fullName: fullName,
+                    password: bcrypt.hashSync(password, 10),
+                    phoneNumber: phoneNumber
+                })
+    
+                res.status(200).json({
+                    success: true,
+                    message: 'Successfully create account',
+                    data: ''
+                })
+            }
+        } catch (error) {
+            res.status(500).json({
+                success: true,
+                message: error.message,
+                data: ''
+            })
+        }
+
+    }
 
 }
 
