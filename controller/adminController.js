@@ -445,7 +445,7 @@ class adminController {
             ingredient1.dataValues.createdAt = formatDate1(ingredient1.dataValues.createdAt)
             ingredient1.dataValues.useStatiscal = []
             ingredient1.dataValues.season = season
-            res.status(452).json({
+            res.status(200).json({
                 success: true, 
                 message: 'Do not have statistical',
                 data: ingredient1
