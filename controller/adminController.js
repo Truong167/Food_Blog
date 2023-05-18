@@ -130,10 +130,12 @@ class adminController {
             //         return item
             //     })
             // }
+            console.log(season)
             season.map(item => {
                 item.ingredientId = ingredientId
                 return item
             })
+            console.log(season)
             try {
                 const result = await sequelize.transaction(async t => {
                     let ingredient = await db.Ingredient.create({
