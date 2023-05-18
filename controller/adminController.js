@@ -240,6 +240,7 @@ class adminController {
                     item.ingredientId = ingredientId
                     return item
                 })
+                console.log(req.body)
                 let ingredient = await db.Ingredient.findByPk(ingredientId)
                 if(ingredient){
                     const updateIngredient = await sequelize.transaction(async t => {
@@ -409,15 +410,15 @@ class adminController {
                 attributes: ['seasonId']
             })
             
+            season.map(item => {
+                item.dataValues.seasonName = item.dataValues.Season.nameOfSeason
+                delete item.dataValues['Season']
+                return item
+            })
             
             if(ingredient && ingredient.length > 0){
                 useStatiscal.map(item => {
                     item.dataValues.time = formatDate2(item.dataValues.time)
-                    return item
-                })
-                season.map(item => {
-                    item.dataValues.seasonName = item.dataValues.Season.nameOfSeason
-                    delete item.dataValues['Season']
                     return item
                 })
                 ingredient.map(item => {
@@ -436,10 +437,17 @@ class adminController {
                 })
             }
 
+            let ingredient1 = await db.Ingredient.findByPk(ingredientId, {
+                attributes: ["ingredientId", "name", "image", "createdAt"]
+            })
+            ingredient1.dataValues.recipeUsed = 0
+            ingredient1.dataValues.createdAt = formatDate1(ingredient1.dataValues.createdAt)
+            ingredient1.dataValues.useStatiscal = []
+            ingredient1.dataValues.season = season
             res.status(452).json({
                 success: true, 
                 message: 'Do not have statistical',
-                data: ''
+                data: ingredient1
             })
             
         } catch (error) {
