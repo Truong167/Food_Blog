@@ -10,6 +10,8 @@ router.get('/getAllUser', userController.getAllUser)
 router.get('/getUser/:id', userController.getUserById)
 router.get('/getUser1/:id', userController.getUserById1)
 router.get('/getCurrentLocation', userController.getCurrentLocation)
+router.get('/getCurrentLocationAllUser', userController.getCurrentLocationAllUser)
+
 
 
 router.get('/getUserFollowing/:userId', userController.getUserFollowing)

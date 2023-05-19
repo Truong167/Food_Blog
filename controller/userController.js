@@ -422,6 +422,33 @@ class userController {
         }
     }
 
+    getCurrentLocationAllUser = async (req, res) => {
+        try {
+            let location = await db.User.findAll({
+                attributes: ["userId", "fullName", "email", "latitude", "longtitude", "currentLocation", "locationLastUpdated"]
+            })
+
+            if(location && location.length > 0){
+                return res.status(200).json({
+                    success: true,
+                    message: 'Successfully get current location',
+                    data: location
+                })
+            }
+            res.status(455).json({
+                success: false,
+                message: 'Can not get current location',
+                data: ''
+            })
+        } catch (error) {
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: ""
+            })
+        }
+    }
+
     updateCurrentLocation = async (req, res) => {
         let {userId} = req
         let {currentLocation, latitude, longtitude} = req.body
