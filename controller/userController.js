@@ -398,7 +398,7 @@ class userController {
         let {userId} = req
         try {
             let location = await db.User.findByPk(userId, {
-                attributes: ["userId", "fullName", "email", "latitude", "longtitude", "currentLocation", "locationLastUpdated"]
+                attributes: ["userId", "fullName", "email", "latitude", "longtitude", "currentLocation", "locationLastUpdated", "avatar"]
             })
 
             if(location.currentLocation){
@@ -425,7 +425,7 @@ class userController {
     getCurrentLocationAllUser = async (req, res) => {
         try {
             let location = await db.User.findAll({
-                attributes: ["userId", "fullName", "email", "latitude", "longtitude", "currentLocation", "locationLastUpdated"]
+                attributes: ["userId", "fullName", "email", "latitude", "longtitude", "currentLocation", "locationLastUpdated", "avatar"]
             })
 
             if(location && location.length > 0){
