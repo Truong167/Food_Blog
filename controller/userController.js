@@ -393,6 +393,98 @@ class userController {
             })
         }
     }
+
+    getCurrentLocation = async (req, res) => {
+        let {userId} = req
+        try {
+            let location = await db.User.findByPk(userId, {
+                attributes: ["userId", "fullName", "email", "latitude", "longtitude", "currentLocation", "locationLastUpdated"]
+            })
+
+            if(location.currentLocation){
+                return res.status(200).json({
+                    success: true,
+                    message: 'Successfully get current location',
+                    data: location
+                })
+            }
+            res.status(455).json({
+                success: false,
+                message: 'Can not get current location',
+                data: ''
+            })
+        } catch (error) {
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: ""
+            })
+        }
+    }
+
+    updateCurrentLocation = async (req, res) => {
+        let {userId} = req
+        let {currentLocation, latitude, longtitude} = req.body
+        try {
+            let user = await db.User.findByPk(userId)
+            if(user){
+                user.currentLocation = currentLocation
+                user.latitude = latitude
+                user.longtitude = longtitude
+                user.locationLastUpdated = Date.now()
+                await user.save()
+                return res.status(200).json({
+                    success: true,
+                    message: 'Successfully updated',
+                    data: ''
+                })
+            }
+
+            res.status(426).json({
+                success: false, 
+                message: 'User not found',
+                data: ""
+            })
+
+        } catch (error) {
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: ""
+            })
+        }
+    }
+
+    deleteCurrentLocation = async (req, res) => {
+        let {userId} = req
+        try {
+            let user = await db.User.findByPk(userId)
+            if(user){
+                user.currentLocation = null
+                user.latitude = null
+                user.longtitude = null
+                user.locationLastUpdated = Date.now()
+                await user.save()
+                return res.status(200).json({
+                    success: true,
+                    message: 'Successfully delete',
+                    data: ''
+                })
+            }
+
+            res.status(426).json({
+                success: false, 
+                message: 'User not found',
+                data: ""
+            })
+        } catch (error) {
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: ""
+            })
+        }
+    }
 }
 
 module.exports = new userController

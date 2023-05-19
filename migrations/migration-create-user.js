@@ -35,6 +35,18 @@ module.exports = {
       dateUpdatedRecipe: {
         type: Sequelize.DATE
       },
+      currentLocation: {
+        type: Sequelize.STRING(128)
+      },
+      latitude: {
+        type: Sequelize.DOUBLE
+      },
+      longtitude: {
+        type: Sequelize.DOUBLE
+      },
+      locationLastUpdated: {
+        type: Sequelize.DATE
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
