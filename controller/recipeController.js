@@ -628,7 +628,7 @@ class recipeController {
                     {
                         model: db.User,
                         attributes: [
-                            "userId", "fullName", "avatar", "introduce", "address", "video",
+                            "userId", "fullName", "avatar", "introduce", "address",
                             [sequelize.literal(` (SELECT CASE WHEN EXISTS 
                                 (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${userId}) 
                                 then True else False end isFollow) `), "isFollow"]
