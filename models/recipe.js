@@ -66,6 +66,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     image: DataTypes.STRING,
     description: DataTypes.STRING,
+    video: DataTypes.STRING,
     userId: DataTypes.INTEGER,
   }, {
     sequelize,

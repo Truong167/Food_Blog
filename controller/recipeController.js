@@ -169,6 +169,7 @@ class recipeController {
                             image: req.files.recipe ? `/recipe/${req.files.recipe[0].filename}` : null,
                             cookingTime: data.cookingTime,
                             description: data.description ? data.description : null,
+                            video: data.video ? data.video : null,
                             userId: userId
                         }, { transaction: t })
                         DetailIngredients  = data.DetailIngredients.map(item => {
@@ -393,6 +394,7 @@ class recipeController {
                         recipe.status = data.status
                         recipe.description = data.description
                         recipe.image = req.files.recipe ? `/recipe/${req.files.recipe[0].filename}` : recipe.image
+                        recipe.video = data.video
         
                         await recipe.save({transaction: t})
         
@@ -626,7 +628,7 @@ class recipeController {
                     {
                         model: db.User,
                         attributes: [
-                            "userId", "fullName", "avatar", "introduce", "address",
+                            "userId", "fullName", "avatar", "introduce", "address", "video",
                             [sequelize.literal(` (SELECT CASE WHEN EXISTS 
                                 (Select * from "Follow" where "userIdFollowed" = "User"."userId" and "userIdFollow" = ${userId}) 
                                 then True else False end isFollow) `), "isFollow"]

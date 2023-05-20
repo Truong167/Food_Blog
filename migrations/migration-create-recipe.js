@@ -59,6 +59,9 @@ module.exports = {
       description: {
         type: Sequelize.STRING(128)
       },
+      video: {
+        type: Sequelize.STRING(256)
+      },
       userId: {
         type: Sequelize.INTEGER,
         references: {
