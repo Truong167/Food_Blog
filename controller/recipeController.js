@@ -660,6 +660,9 @@ class recipeController {
                     ]}
                 })
         
+            recipe.dataValues.Steps.sort((x, y) => {
+                return x.stepIndex - y.stepIndex
+            })
             recipe.dataValues.DetailLists.map(item => {
                 item.dataValues.name = item.dataValues.RecipeList.dataValues.name
                 delete item.dataValues['RecipeList']
