@@ -19,6 +19,14 @@ class stepController {
         }
     }
 
+    getAllStep = async (req, res) => {
+        let step = await db.Step.findAll()
+        res.json({
+            success: true,
+            data: step
+        })
+    }
+
 }
 
 module.exports = new stepController

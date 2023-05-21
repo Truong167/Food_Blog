@@ -11,7 +11,7 @@ const {sequelize} = require('../models/index')
 const jwt = require('jsonwebtoken')
 const mailer = require('../middlewares/utils/mailer')
 const OtpGenerator = require('otp-generator')
-const formatDate = require('../middlewares/utils/formatDate')
+const {formatDate} = require('../middlewares/utils/formatDate')
 require('dotenv').config()
 
 class authController {

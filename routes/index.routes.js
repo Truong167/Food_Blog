@@ -26,7 +26,6 @@ function routes(app){
     app.use('/api/v1/comment',verifyToken, commentRouter)
     app.use('/api/v1/favorite',verifyToken, favoriteRouter)
     app.use('/api/v1/follow',verifyToken, followRouter)
-    app.use('api/v1/step', verifyToken, stepRouter)
     app.use('/api/v1/auth', authRouter)
     app.use('/api/v1/admin', adminRouter)
 
@@ -38,7 +37,7 @@ function routes(app){
     // app.use('/api/v1/comment', commentRouter)
     // app.use('/api/v1/favorite', favoriteRouter)
     // app.use('/api/v1/follow', followRouter)
-    // app.use('/api/v1/step', stepRouter)
+    app.use('/api/v1/step', stepRouter)
     // app.use('/api/v1/auth', authRouter)
     app.use('/', (req, res) => {res.send({ message: 'Đây là Food Blog Web Services' })});
 }
