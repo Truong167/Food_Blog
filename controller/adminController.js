@@ -300,6 +300,14 @@ class adminController {
     deleteIngredient = async (req, res) => {
         let { ingredientId } = req.params
         try {
+            let ingredient = await db.Ingredient.findByPk(ingredientId)
+            if(!ingredient){
+                return res.status(427).json({
+                    success: false, 
+                    message: 'Ingredient not found',
+                    data: ""
+                })
+            }
             let dtIngredient = await db.DetailIngredient.findAll({
                 where: {
                     ingredientId: ingredientId

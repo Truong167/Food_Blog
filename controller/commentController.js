@@ -25,7 +25,13 @@ class commentController {
                 })
                 if(comment && comment.length > 0) {
                     let commentCount = await db.Comment.count({where: {recipeId: recipeId}})
-                    let myComment = await db.Comment.findOne({where: {userId: userId, recipeId: recipeId}})
+                    let myComment = await db.Comment.findOne({where: {userId: userId, recipeId: recipeId},
+                        include: {
+                            model: db.User,
+                            attributes: ["fullName", "avatar"]
+                        },
+                        attributes: {exclude: ["createdAt", "updatedAt"]},
+                    })
                     let newData = {comment, commentCount: commentCount, myComment}
                     return res.status(200).json({
                         success: true, 

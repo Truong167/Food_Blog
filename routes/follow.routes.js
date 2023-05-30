@@ -9,6 +9,8 @@ const followController = require('../controller/followController')
 router.get('/', followController.index)
 router.post('/create/:userIdFollowed', followController.handleCreateFollow)
 router.delete('/delete/:userIdFollowed', followController.handleDeleteFollow)
+router.delete('/delete1/:userIdFollow', followController.handleDeleteFollow1)
+
 
 
 

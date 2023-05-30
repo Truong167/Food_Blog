@@ -76,6 +76,38 @@ class followController {
             })
         }
     }
+
+    handleDeleteFollow1 = async (req, res) => {
+        try {
+            let { userIdFollow } = req.params
+            let follow = await db.Follow.findOne({
+                where: {
+                    userIdFollowed: req.userId, 
+                    userIdFollow: userIdFollow,
+                }
+            })
+            if(follow) {
+                let followData = await follow.destroy()
+                res.status(200).json({
+                    success: true, 
+                    message: 'Successfully',
+                    data: followData
+                })
+                return
+            }
+            res.status(435).json({
+                success: false, 
+                message: 'Follow not found',
+                data: ""
+            })
+        } catch (error) {
+            res.status(500).json({
+                success: false, 
+                message: error.message,
+                data: ""
+            })
+        }
+    }
     
 
 }
