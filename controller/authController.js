@@ -50,38 +50,44 @@ class authController {
                 message: 'Please provide all required fields',
                 data: ""
             })
-        } else if( password != password2){
+        } 
+        else if(!validateEmail(email)){
+            res.status(421).json({
+                success: false,
+                message: 'Email address has invalid format',
+                data: ""
+            })
+        } 
+        else if(emailCheck){
+            res.status(422).json({
+                success: false,
+                message: 'Email already exists',
+                data: ""
+            })
+        } 
+        else if(accountCheck){
+            res.status(423).json({
+                success: false,
+                message: 'Account already exists',
+                data: ""
+            })
+        } 
+        else if( password != password2){
             res.status(419).json({
                 success: false,
                 message: 'The entered passwords do not match',
                 data: ""
             })
-        } else if(!validatePassword(password)){
+        } 
+        else if(!validatePassword(password)){
             res.status(420).json({
                 success: false,
                 message:
                   'Your password must be at least 6 characters long and contain a lowercase letter, an uppercase letter, a numeric digit and a special character.',
                 data: ""
               })
-        } else if(!validateEmail(email)){
-            res.status(421).json({
-                success: false,
-                message: 'Email address has invalid format',
-                data: ""
-            })
-        } else if(emailCheck){
-            res.status(422).json({
-                success: false,
-                message: 'Email already exists',
-                data: ""
-            })
-        } else if(accountCheck){
-            res.status(423).json({
-                success: false,
-                message: 'Account already exists',
-                data: ""
-            })
-        } else {
+        } 
+        else {
             try {
                 const result = await sequelize.transaction(async t => {
                     let user = await db.User.create({
